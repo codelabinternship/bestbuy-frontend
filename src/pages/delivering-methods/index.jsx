@@ -15,6 +15,7 @@ import {
   addProduct,
   updateProduct,
   deleteProduct,
+  updateSwitchStatus,
 } from "../../features/sliceDelivering/deliveringSlice";
 
 const DeliveringMethods = () => {
@@ -84,6 +85,12 @@ const DeliveringMethods = () => {
     setEditingId(item.id);
     setShowForm(true);
   };
+  // if bilan tekshirish id bil
+
+  const handleSwitchStatusChange = (id, status) => {
+   dispatch(updateSwitchStatus({id,status}))
+  }
+
 
   const handleDelete = (id) => {
     if (confirm("Are you sure you want to delete this item?")) {
@@ -139,13 +146,11 @@ const DeliveringMethods = () => {
             />
           </div>
           <div className="flex items-center gap-4 mb-6">
-            <p>Statusi</p>
+            {/* <p>Statusi</p>
             <Switch
-              checked={deliveringForm.status}
-              onCheckedChange={(value) => handleChange({target:{ name: "status",value }})}
-            />
-
-
+              checked={deleteProduct.status}
+              onCheckedChange={(value) => handleChange({ target: { name: "status", value } })}
+            /> */}
           </div>
           <div className="flex justify-between">
             <button
@@ -184,7 +189,11 @@ const DeliveringMethods = () => {
                   {item.date ? new Date(item.date).toLocaleDateString() : "—"}
                 </TableCell>
                 <TableCell>
-                  <Switch checked={item.status} />
+                  <Switch
+                    checked={item.status}
+                    onCheckedChange={(value) => handleSwitchStatusChange(item.id, value)}
+                  />
+
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex gap-2 justify-end">
