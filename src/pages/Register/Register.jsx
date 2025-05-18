@@ -27,10 +27,10 @@ export default function Register() {
     e.preventDefault();
 
     const newErrors = {};
-    if (!formData.fullName) newErrors.fullName = "Full name is required";
-    if (!formData.email) newErrors.email = "Email is required";
-    if (!formData.password) newErrors.password = "Password is required";
-    if (!formData.company) newErrors.company = "Company is required";
+    // if (!formData.fullName) newErrors.fullName = "Full name is required";
+    // if (!formData.email) newErrors.email = "Email is required";
+    // if (!formData.password) newErrors.password = "Password is required";
+    // if (!formData.company) newErrors.company = "Company is required";
 
     setFormErrors(newErrors);
 

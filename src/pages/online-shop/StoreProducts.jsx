@@ -40,12 +40,13 @@ function StoreProducts() {
   const [isEditing, setIsEditing] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [productForm, setProductForm] = useState({
-    title: "",
-    description: "",
-    price: "",
-    items: "",
-    imageFile: null,
-    imagePreview: "",
+    name: "fadsfasd",
+    description: "ffasdf",
+    price: 11,
+    discount_price: "111",
+    stock_quantity: 1,
+    brand: "11",
+    category: 1,
   });
 
   const handleChange = (e) => {
@@ -66,10 +67,10 @@ function StoreProducts() {
   };
   const handleSave = () => {
     const { title, description, price, items, imagePreview } = productForm;
-    if (!title || !description || !items || !imagePreview) {
-      alert("Please fill in all fields.");
-      return;
-    }
+    // if (!title || !description || !items || !imagePreview) {
+    //   alert("Please fill in all fields.");
+    //   return;
+    // }
 
     const productData = {
       id: isEditing ? editingId : Date.now(),

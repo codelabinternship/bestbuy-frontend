@@ -1,9 +1,12 @@
-// api/authApi.js
 import axios from "axios";
+const API_URL = "http://192.168.23.10:8000";
 
-const API_URL = "https://yourapi.com/api"; // Replace with your actual endpoint
+export const registerUser = async (data, tree) => {
+  const response = await axios.post(`${API_URL}${tree}`, data);
+  return response.data;
+};
 
-export const registerUser = async (data) => {
-  const response = await axios.post(`${API_URL}/register`, data);
+export const GetData = async (tree) => {
+  const response = await axios(`${API_URL}${tree}`);
   return response.data;
 };
