@@ -10,9 +10,19 @@ const initialState = {
 
 export const register = createAsyncThunk(
   "auth/register",
-  async (formData, { rejectWithValue }) => {
+  async ({ rejectWithValue }) => {
     try {
-      const response = await registerUser(formData);
+      const response = await registerUser(
+        {
+          user_id: 11111111,
+          user_name: "fasdffsd",
+          phone_number: "fasdf",
+          email: "jfkasldf@gmail.com",
+          password: "jklfdskjfsd",
+          market_name: "fddsaf",
+        },
+        "/api/auth/register/"
+      );
       return response;
     } catch (err) {
       return rejectWithValue(
