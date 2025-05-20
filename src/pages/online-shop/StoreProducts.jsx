@@ -179,13 +179,13 @@ function StoreProducts() {
     }
   };
 
-  useEffect(() => {
-    const calcProfit = salePrice - costPrice;
-    const calcMargin =
-      salePrice > 0 ? ((calcProfit / salePrice) * 100).toFixed(1) : 0;
-    setProfit(calcProfit);
-    setMargin(calcMargin);
-  }, [salePrice, costPrice]);
+useEffect(() => {
+  const fetchProducts = async () => {
+    const data = await GetData("/products/");
+    dispatch(setProducts(data));
+  };
+  fetchProducts();
+}, [dispatch]);
 
   return (
     <div className="max-w-6xl mx-auto p-6 dark:bg-[#222122] dark:text-white">
