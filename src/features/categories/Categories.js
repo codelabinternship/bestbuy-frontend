@@ -1,44 +1,71 @@
-import axios from "axios";
-import { createSlice } from "@reduxjs/toolkit";
-import { GetData, registerUser } from "@/api/authApi";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { GetData, PostData, PutData, DeleteData } from "@/api/authApi";
 
-const initialState = {
-  list: GetData("/categories/"),
-  //  {
-  //     id: 3,
-  //     title: "Ноутбуки и компьютеры",
-  //     description:
-  //       "<p>Track your health and fitness with this sleek smartwatch.</p>",
-  //     price: 199.99,
-  //     items: 10,
-  //     imagePreview:
-  //       "https://avatars.mds.yandex.net/i?id=2796348e6608eb7d4dee859fefa1ac27742c7374-10310276-images-thumbs&n=13",
-  //     videoUrl: null,
-  //     profit: 80,
-  //     margin: 40,
-  //     taxable: true,
-  //     date: [1, "June", 2025],
-  //   },
-};
+export const fetchCategories = createAsyncThunk(
+  "categories/fetchAll",
+  async () => {
+    const data = await GetData("/categories/");
+    return data;
+  }
+);
+
+export const addCategory = createAsyncThunk(
+  "categories/add",
+  async (category) => {
+    const data = await PostData(category, "/categories/");
+    return data;
+  }
+);
+
+export const updateCategory = createAsyncThunk(
+  "categories/update",
+  async (category) => {
+    const data = await PutData(category, `/categories/${category.id}/`);
+    return data;
+  }
+);
+
+export const deleteCategory = createAsyncThunk(
+  "categories/delete",
+  async (id) => {
+    await DeleteData(`/categories/${id}/`);
+    return id;
+  }
+);
+
 
 const categoriesSlice = createSlice({
-  name: "products",
-  initialState,
-  reducers: {
-    addProduct: (state, action) => {
-      state.list.push(action.payload);
-      registerUser(action.payload, "/products/");
-    },
-    updateProduct: (state, action) => {
-      const index = state.list.findIndex((p) => p.id === action.payload.id);
-      if (index !== -1) state.list[index] = action.payload;
-    },
-    deleteProduct: (state, action) => {
-      state.list = state.list.filter((p) => p.id !== action.payload);
-    },
+  name: "categories",
+  initialState: {
+    list: [],
+    loading: false,
+    error: null,
+  },
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchCategories.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchCategories.fulfilled, (state, action) => {
+        state.loading = false;
+        state.list = action.payload;
+      })
+      .addCase(fetchCategories.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      })
+      .addCase(addCategory.fulfilled, (state, action) => {
+        state.list.push(action.payload);
+      })
+      .addCase(updateCategory.fulfilled, (state, action) => {
+        const index = state.list.findIndex((c) => c.id === action.payload.id);
+        if (index !== -1) state.list[index] = action.payload;
+      })
+      .addCase(deleteCategory.fulfilled, (state, action) => {
+        state.list = state.list.filter((c) => c.id !== action.payload);
+      });
   },
 });
 
-export const { addProduct, updateProduct, deleteProduct } =
-  categoriesSlice.actions;
 export default categoriesSlice.reducer;

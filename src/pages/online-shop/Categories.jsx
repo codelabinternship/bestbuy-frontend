@@ -9,9 +9,10 @@ import {
 } from "@/components/ui/table";
 
 import {
-  addProduct,
-  updateProduct,
-  deleteProduct,
+  fetchCategories,
+  addCategory,
+  updateCategory,
+  deleteCategory,
 } from "@/features/categories/Categories";
 import { Delete, Image, Pen, Trash, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -52,29 +53,33 @@ function ProductsCategories() {
       });
     }
   };
-  const handleSave = () => {
-    const { title, description, imagePreview, status } = productForm;
-    if (!title || !description || !imagePreview || !status) {
-      alert("Please fill in all fields.");
-      return;
-    }
+  useEffect(() => {
+  dispatch(fetchCategories());
+}, [dispatch])
+const handleSave = () => {
+  const { title, description, imagePreview, status } = productForm;
+  if (!title || !description || !imagePreview || !status) {
+    alert("Please fill in all fields.");
+    return;
+  }
 
-    const productData = {
-      id: isEditing ? editingId : Date.now(),
-      title,
-      description,
-      imagePreview,
-      date: new Date().toISOString(), // add this line
-    };
-
-    if (isEditing) {
-      dispatch(updateProduct(productData));
-    } else {
-      dispatch(addProduct(productData));
-    }
-
-    resetForm();
+  const productData = {
+    id: isEditing ? editingId : undefined, // For update
+    title,
+    description,
+    imagePreview,
+    status,
+    date: new Date().toISOString(),
   };
+
+  if (isEditing) {
+    dispatch(updateCategory(productData));
+  } else {
+    dispatch(addCategory(productData));
+  }
+
+  resetForm();
+};
 
   const handleEdit = (product) => {
     setProductForm({
@@ -90,11 +95,11 @@ function ProductsCategories() {
     setShowForm(true);
   };
 
-  const handleDelete = (id) => {
-    if (confirm("Are you sure you want to delete this product?")) {
-      dispatch(deleteProduct(id));
-    }
-  };
+ const handleDelete = (id) => {
+  if (confirm("Are you sure you want to delete this category?")) {
+    dispatch(deleteCategory(id));
+  }
+};
   const resetForm = () => {
     setProductForm({
       title: "",
