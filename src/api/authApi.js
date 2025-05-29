@@ -1,6 +1,6 @@
 // src/api/authApi.js
 import axios from "axios";
-const API_URL = "http://192.168.174.177:8000";
+const API_URL = "http://192.168.137.236:8000";
 
 export const PostData = async (data, tree) => {
   console.log(data);

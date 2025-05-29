@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     Table,
     TableBody,
@@ -8,70 +8,31 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
+import { Delete, Icon, ShoppingBasket, Trash2 } from "lucide-react";
+import { DeleteData, GetData } from "@/api/authApi";
+import axios from "axios";
+import { Button } from "@/components/ui/button";
 
 const Reviews = () => {
-    const reviews = [
-        {
-            id: "INV002",
-            name: "Zilola",
-            comment:
-                "Mahsulot juda tez yetkazildi. Tashqi ko'rinishi ham chiroyli. Juda mamnun bo'ldim! ifiewmiwdmicmwimciwcmwivirwijvrwijjiwnvivnw39vjr9fevimeomv93vm9w",
-        },
-        {
-            id: "INV003",
-            name: "Alisher",
-            comment:
-                "Mahsulot juda tez yetkazildi. Tashqi ko'rinishi ham chiroyli. Juda mamnun bo'ldim! ifiewmiwdmicmwimciwcmwivirwijvrwijjiwnvivnw39vjr9fevimeomv93vm9w",
-        },
-        {
-            id: "INV004",
-            name: "Munisa",
-            comment:
-                "Mahsulot juda tez yetkazildi. Tashqi ko'rinishi ham chiroyli. Juda mamnun bo'ldim! ifiewmiwdmicmwimciwcmwivirwijvrwijjiwnvivnw39vjr9fevimeomv93vm9wjjitj4tj4iji4jgit4ji",
-        },
-        {
-            id: "INV005",
-            name: "Sharif",
-            comment:
-                "Mahsulot juda tez yetkazildi. Tashqi ko'rinishi ham chiroyli. Juda mamnun bo'ldim! ifiewmiwdmicmwimciwcmwivirwijvrwijjiwnvivnw39vjr9fevimeomv93vm9wjjitj4tj4iji4jgit4ji",
-        },
-        {
-            id: "INV006",
-            name: "Aziz",
-            comment:
-                "Mahsulot juda tez yetkazildi. Tashqi ko'rinishi ham chiroyli. Juda mamnun bo'ldim! ifiewmiwdmicmwimciwcmwivirwijvrwijjiwnvivnw39vjr9fevimeomv93vm9wjjitj4tj4iji4jgit4ji",
-        },
-        {
-            id: "INV007",
-            name: "Afruzbek",
-            comment:
-                "Mahsulot juda tez yetkazildi. Tashqi ko'rinishi ham chiroyli. Juda mamnun bo'ldim! ifiewmiwdmicmwimciwcmwivirwijvrwijjiwnvivnw39vjr9fevimeomv93vm9wjjitj4tj4iji4jgit4ji",
-        },
-        {
-            id: "INV008",
-            name: "Ibrohim",
-            comment:
-                "Mahsulot juda tez yetkazildi. Tashqi ko'rinishi ham chiroyli. Juda mamnun bo'ldim! ifiewmiwdmicmwimciwcmwivirwijvrwijjiwnvivnw39vjr9fevimeomv93vm9wjjitj4tj4iji4jgit4ji",
-        },
-        {
-            id: "INV009",
-            name: "Hilola",
-            comment:
-                "Mahsulot juda tez yetkazildi. Tashqi ko'rinishi ham chiroyli. Juda mamnun bo'ldim! ifiewmiwdmicmwimciwcmwivirwijvrwijjiwnvivnw39vjr9fevimeomv93vm9wjjitj4tj4iji4jgit4ji",
-        },
-        {
-            id: "INV010",
-            name: "Laziza",
-            comment:
-                "Mahsulot juda tez yetkazildi. Tashqi ko'rinishi ham chiroyli. Juda mamnun bo'ldim! ifiewmiwdmicmwimciwcmwivirwijvrwijjiwnvivnw39vjr9fevimeomv93vm9wjjitj4tj4iji4jgit4ji",
-        },
-    ];
+    const [reviews, setReviews] = useState([])
+
+    useEffect(() => {
+        const fetchReviews = async () => {
+            const data = await GetData("/api/reviews/");
+            setReviews(data);
+        };
+        fetchReviews();
+    }, []);
 
     const [expanded, setExpanded] = useState("");
     const toggleExpand = (id) => {
 
         setExpanded(id);
     };
+    const handleDelete = async (id) => {
+        const response = await DeleteData("/api/reviews/", id+"/");
+      
+    }
 
     return (
         <div>
@@ -83,28 +44,36 @@ const Reviews = () => {
                         <TableHead >ID</TableHead>
                         <TableHead >Ism</TableHead>
                         <TableHead>Sharh</TableHead>
+                        <TableHead>Harakatlar</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {reviews.map((review) => (
-                        <TableRow key={review.id}>
-                            <TableCell className="font-medium">{review.id}</TableCell>
-                            <TableCell>{review.name}</TableCell>
+                        <TableRow key={review.comment}>
+                            <TableCell className="font-medium">{review.review_id}</TableCell>
+                            <TableCell>{review.comment}</TableCell>
                             <TableCell>
-                                    <p
-                                     onClick={() => toggleExpand(review.id)}
-                                    className={`${expanded === review.id ? "" : "line-clamp-1 !overflow-hidden  w-[250px]"} `}>
-                                        {review.comment}
-                                    </p>
+                                <p
+                                    onClick={() => toggleExpand(review.review_id)}
+                                    className={`${expanded === review.review_id ? "" : "line-clamp-1 !overflow-hidden  w-[250px]"} `}>
+                                    {review.comment}
+                                </p>
                                 <div>
-                                <button
-                                    onClick={() => toggleExpand(null)}
-                                    className="text-blue-600 mt-2"
+                                    <button
+                                        onClick={() => toggleExpand(null)}
+                                        className="text-blue-600 mt-2"
                                     >
-                                    {expanded === review.id ? "Yashirish" : ""}
-                                </button>
+                                        {expanded === review.review_id ? "Yashirish" : ""}
+                                    </button>
                                 </div>
+
                             </TableCell>
+                            <TableCell>
+                                <Button onClick={()=>handleDelete(review.review_id)}  variant="outline" className="bg-transparent" >
+                                    <Trash2 className="" />
+                                </Button>
+                            </TableCell>
+
                         </TableRow>
                     ))}
                 </TableBody>
