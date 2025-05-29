@@ -14,12 +14,12 @@ export const addCategory = createAsyncThunk(
   "categories/addCategory",
   async (formData) => {
     const response = await axios.post(
-      "http://192.168.156.83:8000/categories/",
+      "http://192.168.174.177:8000/categories/",
       formData,
       {
         headers: {
           "Content-Type": "multipart/form-data",
-        },  
+        },
       }
     );
     return response.data;

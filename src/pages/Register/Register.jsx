@@ -40,7 +40,7 @@ export default function Register() {
         {
           user_name: "test",
           phone_number: "fasdf",
-          email: "test@gmail.com",
+          email: "testx8@gmail.com",
           password: "qwerty123",
           market_name: "fddsaf",
         },

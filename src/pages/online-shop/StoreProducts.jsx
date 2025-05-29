@@ -75,8 +75,8 @@ function StoreProducts() {
     // }
 
     const formData = new FormData();
-    formData.append("name", title);
-    formData.append("description", description);
+    formData.append("name", "fsadfsadf");
+    formData.append("description", "sadfasdfsad");
     formData.append("price", "11");
     formData.append("discount_price", "111");
     formData.append("stock_quantity", 1);

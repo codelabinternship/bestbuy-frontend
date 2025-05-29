@@ -13,8 +13,7 @@ const productsSlice = createSlice({
       state.list = action.payload;
     },
     addProduct: (state, action) => {
-      state.list.push(action.payload);
-      PostData("/products/", action.payload);
+      PostData(action.payload, "/products/");
     },
     updateProduct: (state, action) => {
       const index = state.list.findIndex((p) => p.id === action.payload.id);
