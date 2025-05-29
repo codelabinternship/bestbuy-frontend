@@ -75,7 +75,7 @@ function ProductsCategories() {
     formData.append("name", title);
     formData.append("description", description);
     formData.append("image", imageFile);
-    formData.append("status", status === "true" || status === true);
+    formData.append("status", true);
 
     if (isEditing) {
       formData.append("id", editingId); // Add ID for update
