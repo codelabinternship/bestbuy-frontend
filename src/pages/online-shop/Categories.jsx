@@ -9,9 +9,10 @@ import {
 } from "@/components/ui/table";
 
 import {
-  addProduct,
-  updateProduct,
-  deleteProduct,
+  fetchCategories,
+  addCategory,
+  updateCategory,
+  deleteCategory,
 } from "@/features/categories/Categories";
 import { Delete, Image, Pen, Trash, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -33,7 +34,7 @@ function ProductsCategories() {
     description: "",
     items: "",
     imageFile: null,
-    imagePreview: "",
+    image: "",
   });
 
   const handleChange = (e) => {
@@ -42,35 +43,45 @@ function ProductsCategories() {
   };
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const preview = URL.createObjectURL(file);
-      setProductForm({
-        ...productForm,
-        imageFile: file,
-        imagePreview: preview,
-      });
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Clean up previous preview URL
+    if (productForm.image) {
+      URL.revokeObjectURL(productForm.image);
     }
+
+    const previewURL = URL.createObjectURL(file);
+
+    setProductForm((prev) => ({
+      ...prev,
+      imageFile: file,
+      image: previewURL,
+    }));
   };
+
+  useEffect(() => {
+    dispatch(fetchCategories());
+  }, [dispatch]);
+
   const handleSave = () => {
-    const { title, description, imagePreview, status } = productForm;
-    if (!title || !description || !imagePreview || !status) {
+    const { title, description, imageFile, status } = productForm;
+    if (!title || !description || status === "") {
       alert("Please fill in all fields.");
       return;
     }
 
-    const productData = {
-      id: isEditing ? editingId : Date.now(),
-      title,
-      description,
-      imagePreview,
-      date: new Date().toISOString(), // add this line
-    };
+    const formData = new FormData();
+    formData.append("name", title);
+    formData.append("description", description);
+    formData.append("image", imageFile);
+    formData.append("status", status === "true" || status === true);
 
     if (isEditing) {
-      dispatch(updateProduct(productData));
+      formData.append("id", editingId); // Add ID for update
+      dispatch(updateCategory(formData));
     } else {
-      dispatch(addProduct(productData));
+      dispatch(addCategory(formData));
     }
 
     resetForm();
@@ -83,7 +94,7 @@ function ProductsCategories() {
       price: product.price,
       items: product.items,
       imageFile: null,
-      imagePreview: product.imagePreview,
+      image: product.image,
     });
     setIsEditing(true);
     setEditingId(product.id);
@@ -91,8 +102,8 @@ function ProductsCategories() {
   };
 
   const handleDelete = (id) => {
-    if (confirm("Are you sure you want to delete this product?")) {
-      dispatch(deleteProduct(id));
+    if (confirm("Are you sure you want to delete this category?")) {
+      dispatch(deleteCategory(id));
     }
   };
   const resetForm = () => {
@@ -102,7 +113,7 @@ function ProductsCategories() {
       price: "",
       items: "",
       imageFile: null,
-      imagePreview: "",
+      image: "",
     });
     setIsEditing(false);
     setEditingId(null);
@@ -122,7 +133,7 @@ function ProductsCategories() {
               price: "",
               items: "",
               imageFile: null,
-              imagePreview: "",
+              image: "",
             });
             setIsEditing(false);
             setShowForm(true);
@@ -141,9 +152,9 @@ function ProductsCategories() {
                   Фото (1080x1440)
                 </label>
                 <div className="relative w-40 h-40 border border-dashed dark:bg-[#2a2a2a]  rounded flex items-center justify-center bg-gray-50">
-                  {productForm.imagePreview ? (
+                  {productForm.image ? (
                     <img
-                      src={productForm.imagePreview}
+                      src={productForm.image}
                       alt="Preview"
                       className="w-full h-full object-cover rounded"
                     />
@@ -180,8 +191,8 @@ function ProductsCategories() {
                       setProductForm({ ...productForm, status: e.target.value })
                     }
                   >
-                    <option value="active">Активный</option>
-                    <option value="inactive">Неактивный</option>
+                    <option value={false}>Активный</option>
+                    <option value={true}>Неактивный</option>
                   </select>
                 </div>
                 <p className="text-xs text-gray-500 mt-1">
@@ -245,7 +256,7 @@ function ProductsCategories() {
                   <TableCell className="font-medium">
                     <img
                       className="w-[60px] h-[60px] object-cover"
-                      src={i.imagePreview}
+                      src={i.image}
                       alt={i.title}
                     />
                   </TableCell>

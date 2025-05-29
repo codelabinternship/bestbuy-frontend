@@ -1,6 +1,6 @@
 // features/auth/authSlice.js
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { registerUser } from "../../api/authApi";
+import { PostData } from "../../api/authApi";
 
 const initialState = {
   loading: false,
@@ -12,17 +12,14 @@ export const register = createAsyncThunk(
   "auth/register",
   async ({ rejectWithValue }) => {
     try {
-      const response = await registerUser(
-        {
-          user_id: 11111111,
-          user_name: "fasdffsd",
-          phone_number: "fasdf",
-          email: "jfkasldf@gmail.com",
-          password: "jklfdskjfsd",
-          market_name: "fddsaf",
-        },
-        "/api/auth/register/"
-      );
+      const response = await PostData("/api/auth/register/", {
+        user_name: "fasdffsd",
+        phone_number: "fasdf",
+        email: "jfkasldf@gmail.com",
+        password: "jklfdskjfsd",
+        market_name: "fddsaf",
+      });
+
       return response;
     } catch (err) {
       return rejectWithValue(

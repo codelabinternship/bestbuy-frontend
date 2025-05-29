@@ -4,7 +4,6 @@ import {
   TableBody,
   TableCaption,
   TableCell,
-  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -16,25 +15,26 @@ import {
   deleteProduct,
 } from "@/features/products/Products";
 
-import { Delete, Image, Pen, Trash, Trash2 } from "lucide-react";
+import { Image, Pen, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { useDispatch, useSelector } from "react-redux";
 import Variations from "./components/Variations";
+import { GetData } from "@/api/authApi";
 
 function StoreProducts() {
   const [videoFile, setVideoFile] = useState(null);
   const [videoPreview, setVideoPreview] = useState("");
-  const [salePrice, setSalePrice] = useState(0);
+  // const [salePrice, setSalePrice] = useState(0);
   const [comparePrice, setComparePrice] = useState(0);
   const [costPrice, setCostPrice] = useState(0);
   const [taxable, setTaxable] = useState(false);
   const [profit, setProfit] = useState(0);
   const [margin, setMargin] = useState(0);
   const { t } = useTranslation();
-  const products = useSelector((state) => state.products.list);
+  const [products, setProducts] = useState([]);
   const dispatch = useDispatch();
   const [showForm, setShowForm] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -66,25 +66,40 @@ function StoreProducts() {
     }
   };
   const handleSave = () => {
-    const { title, description, price, items, imagePreview } = productForm;
-    // if (!title || !description || !items || !imagePreview) {
-    //   alert("Please fill in all fields.");
+    const { title, description, price, items, imageFile, brand, category } =
+      productForm;
+
+    // if (!title || !description || !items || !imageFile) {
+    //   alert("Пожалуйста, заполните все обязательные поля.");
     //   return;
     // }
 
-    const productData = {
-      id: isEditing ? editingId : Date.now(),
-      title,
-      description,
-      price,
-      items,
-      imagePreview,
-    };
+    const formData = new FormData();
+    formData.append("name", title);
+    formData.append("description", description);
+    formData.append("price", "11");
+    formData.append("discount_price", "111");
+    formData.append("stock_quantity", 1);
+    formData.append("brand", "fasfdas" || "unknown"); // default fallback
+    // formData.append("category"); // assume a default category ID
+    // formData.append("image", imageFile);
+
+    // Optional: Append video if provided
+    // if (videoFile) {
+    //   formData.append("video", videoFile);
+    // }
+    // Optional: Append taxable, cost_price, profit, margin
+    // formData.append("taxable", taxable);
+    // formData.append("cost_price", costPrice);
+    // formData.append("profit", profit);
+    // formData.append("margin", margin);
 
     if (isEditing) {
-      dispatch(updateProduct(productData));
+      formData.append("id", editingId);
+      dispatch(updateProduct(formData));
     } else {
-      dispatch(addProduct(productData));
+      console.log(formData);
+      dispatch(addProduct(formData));
     }
 
     resetForm();
@@ -92,12 +107,14 @@ function StoreProducts() {
 
   const handleEdit = (product) => {
     setProductForm({
-      title: product.title,
+      title: product.name,
       description: product.description,
       price: product.price,
-      items: product.items,
-      imageFile: null,
-      imagePreview: product.imagePreview,
+      items: product.stock_quantity,
+      brand: product.brand,
+      category: product.category,
+      imageFile: null, // will be updated if changed
+      imagePreview: product.image, // use actual image URL from backend
     });
     setIsEditing(true);
     setEditingId(product.id);
@@ -110,32 +127,6 @@ function StoreProducts() {
     }
   };
 
-  const handleSavee = async () => {
-    if (!title || !description || !price || !items || !imagePreview) {
-      alert("Заполните все обязательные поля.");
-      return;
-    }
-
-    const videoUrl = await uploadVideoToFileIO();
-
-    const newProduct = {
-      id: Date.now(),
-      title,
-      description,
-      price,
-      items,
-      imagePreview,
-      videoUrl,
-      salePrice,
-      comparePrice,
-      costPrice,
-      profit,
-      margin,
-      taxable,
-    };
-
-    setProducts([...products, newProduct]);
-  };
   const resetForm = () => {
     setProductForm({
       title: "",
@@ -150,42 +141,23 @@ function StoreProducts() {
     setShowForm(false);
   };
 
-  const handleVideoChange = (e) => {
-    const file = e.target.files[0];
-    if (file && file.size <= 50 * 1024 * 1024) {
-      setVideoFile(file);
-      setVideoPreview(URL.createObjectURL(file));
-    } else {
-      alert("Максимальный размер видео — 50MB.");
-    }
-  };
-
-  const uploadVideoToFileIO = async () => {
-    if (!videoFile) return null;
-
-    const formData = new FormData();
-    formData.append("file", videoFile);
-
-    try {
-      const response = await fetch("https://file.io", {
-        method: "POST",
-        body: formData,
-      });
-      const data = await response.json();
-      return data.link || null;
-    } catch (error) {
-      console.error("Upload error:", error);
-      return null;
-    }
-  };
+  // const handleVideoChange = (e) => {
+  //   const file = e.target.files[0];
+  //   if (file && file.size <= 50 * 1024 * 1024) {
+  //     setVideoFile(file);
+  //     setVideoPreview(URL.createObjectURL(file));
+  //   } else {
+  //     alert("Максимальный размер видео — 50MB.");
+  //   }
+  // };
 
   useEffect(() => {
-    const calcProfit = salePrice - costPrice;
-    const calcMargin =
-      salePrice > 0 ? ((calcProfit / salePrice) * 100).toFixed(1) : 0;
-    setProfit(calcProfit);
-    setMargin(calcMargin);
-  }, [salePrice, costPrice]);
+    const fetchProducts = async () => {
+      const data = await GetData("/products/");
+      setProducts(data);
+    };
+    fetchProducts();
+  }, [dispatch]);
 
   return (
     <div className="max-w-6xl mx-auto p-6 dark:bg-[#222122] dark:text-white">
@@ -239,7 +211,7 @@ function StoreProducts() {
           </div>
 
           {/* Image Upload */}
-          <div className="border rounded p-4 flex flex-col items-center text-center">
+          {/* <div className="border rounded p-4 flex flex-col items-center text-center">
             <label className="block font-semibold mb-1">Фото (1080x1440)</label>
             <div className="relative w-80 h-40 border border-dashed rounded dark:bg-[#2a2a2a] flex items-center justify-center bg-gray-50">
               {productForm.imagePreview ? (
@@ -269,11 +241,11 @@ function StoreProducts() {
               Принимаются только файлы изображений *.png, *.jpg и *.jpeg
               размером не более 2 мегабайт.
             </p>
-          </div>
+          </div> */}
           {/* Price & Quantity */}
 
           {/* Video Upload */}
-          <div className="border-t pt-6">
+          {/* <div className="border-t pt-6">
             <h3 className="text-lg font-semibold mb-2">📹 Видео</h3>
             <div className="border border-dashed p-4 rounded-lg bg-gray-50 dark:bg-[#2a2a2a]">
               <input
@@ -293,7 +265,7 @@ function StoreProducts() {
                 />
               )}
             </div>
-          </div>
+          </div> */}
 
           {/* Pricing Section */}
           <div className="border-t pt-6 space-y-4">
@@ -304,6 +276,7 @@ function StoreProducts() {
                 <input
                   type="number"
                   placeholder="Цена продажи"
+                  value={productForm}
                   onChange={handleChange}
                   className="w-full border px-3 py-2 rounded dark:bg-[#2a2a2a] dark:text-white"
                 />
@@ -443,9 +416,9 @@ function StoreProducts() {
                       alt={i.title}
                     />
                   </TableCell>
-                  <TableCell className="font-medium">{i.title}</TableCell>
+                  <TableCell className="font-medium">{i.name}</TableCell>
                   <TableCell>{i.price} so'm</TableCell>
-                  <TableCell>{i.items}</TableCell>
+                  <TableCell>{i.stock_quantity}</TableCell>
                   <TableCell>
                     <Switch id={`switch-${i.id}`} />
                   </TableCell>

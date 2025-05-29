@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Eye, EyeOff, Github, Facebook, Twitter } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../app/store";
 import { register } from "../../features/auth/authSlice";
+import { PostData } from "@/api/authApi";
 
 export default function Register() {
   const dispatch = useAppDispatch();
@@ -23,21 +24,40 @@ export default function Register() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const newErrors = {};
-    // if (!formData.fullName) newErrors.fullName = "Full name is required";
-    // if (!formData.email) newErrors.email = "Email is required";
-    // if (!formData.password) newErrors.password = "Password is required";
-    // if (!formData.company) newErrors.company = "Company is required";
+    if (!formData.fullName) newErrors.fullName = "Full name is required";
+    if (!formData.email) newErrors.email = "Email is required";
+    if (!formData.password) newErrors.password = "Password is required";
+    if (!formData.company) newErrors.company = "Company is required";
 
     setFormErrors(newErrors);
+    console.log("asdfsfd");
+    try {
+      const response = await PostData(
+        {
+          user_name: "test",
+          phone_number: "fasdf",
+          email: "test@gmail.com",
+          password: "qwerty123",
+          market_name: "fddsaf",
+        },
+        "/api/auth/register/"
+      );
 
-    if (Object.keys(newErrors).length === 0) {
-      dispatch(register(formData));
+      return response;
+    } catch (err) {
+      // return rejectWithValue(
+      //   err.response?.data?.message || "Registration failed"
     }
+
+    // dispatch(register(formData));
+    // if (Object.keys(newErrors).length === 0) {
+    // }
   };
+  // handleSubmit();
 
   return (
     <div className="min-h-screen flex">
@@ -139,7 +159,7 @@ export default function Register() {
             {/* Submit */}
             <Button
               type="submit"
-              disabled={loading}
+              // disabled={loading}
               className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-full"
             >
               {loading ? "Creating..." : "Create Account"}
