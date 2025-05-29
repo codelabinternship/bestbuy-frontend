@@ -14,21 +14,30 @@ const productsSlice = createSlice({
     },
     addProduct: (state, action) => {
       state.list.push(action.payload);
-      PostData("/products/", action.payload); // Optional: Fire-and-forget
+      PostData("/products/", action.payload);
     },
     updateProduct: (state, action) => {
-      const index = state.list.findIndex(p => p.id === action.payload.id);
+      const index = state.list.findIndex((p) => p.id === action.payload.id);
       if (index !== -1) {
         state.list[index] = action.payload;
-        PutData(`/products/${action.payload.id}/`, action.payload); // Optional
+        PutData(`/products/${action.payload.id}/`, {
+          name: "addsf",
+          description: "fadsfsdafds",
+          price: "123",
+          discount_price: "dasdf",
+          stock_quantity: 22,
+          brand: "artel",
+          category: 12,
+        }); // Optional
       }
     },
     deleteProduct: (state, action) => {
-      state.list = state.list.filter(p => p.id !== action.payload);
+      state.list = state.list.filter((p) => p.id !== action.payload);
       DeleteData(`/products/${action.payload}/`); // Optional
     },
   },
 });
 
-export const { setProducts, addProduct, updateProduct, deleteProduct } = productsSlice.actions;
+export const { setProducts, addProduct, updateProduct, deleteProduct } =
+  productsSlice.actions;
 export default productsSlice.reducer;

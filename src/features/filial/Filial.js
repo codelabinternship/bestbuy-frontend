@@ -1,46 +1,24 @@
+import { DeleteData, GetData, PostData, PutData } from "@/api/authApi";
 import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
-  list: [
-    {
-      id: 1,
-      name: "Novza",
-      address: "Yunusobod",
-      city: "Tashkent",
-      status: "active",
-    },
-  ],
+  list: GetData("/branches/"),
 };
 const filialReducer = createSlice({
   name: "categories",
   initialState,
   reducers: {
     addFilial: (state, action) => {
-      state.list.push(action.payload);
+      // state.list.push(action.payload);
+      PostData(action.payload, "/branches/");
     },
     updateFilial: (state, action) => {
-      const index = state.list.findIndex(
-        (item) => item.id === action.payload.id
-      );
-      if (index !== -1) {
-        state.list[index] = {
-          ...state.list[index],
-          ...action.payload,
-        };
-      }
-    },
-    updateProduct: (state, action) => {
-      const index = state.list.findIndex(
-        (item) => item.id === action.payload.id
-      );
-      if (index !== -1) {
-        state.list[index] = {
-          ...state.list[index],
-          ...action.payload,
-        };
-      }
+      PutData("/branches/", `${action.payload.id}/`, action.payload);
     },
     deleteFilial: (state, action) => {
-      state.list = state.list.filter((item) => item.id !== action.payload);
+      console.log(action.payload);
+
+      // state.list = state.list.filter((item) => item.id !== action.payload);
+      DeleteData("/branches/", `${action.payload}/`);
     },
   },
 });

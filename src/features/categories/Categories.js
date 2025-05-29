@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { GetData, PostData, PutData, DeleteData } from "@/api/authApi";
+import axios from "axios";
 
 export const fetchCategories = createAsyncThunk(
   "categories/fetchAll",
@@ -10,18 +11,31 @@ export const fetchCategories = createAsyncThunk(
 );
 
 export const addCategory = createAsyncThunk(
-  "categories/add",
-  async (category) => {
-    const data = await PostData(category, "/categories/");
-    return data;
+  "categories/addCategory",
+  async (formData) => {
+    const response = await axios.post(
+      "http://192.168.156.83:8000/categories/",
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },  
+      }
+    );
+    return response.data;
   }
 );
 
 export const updateCategory = createAsyncThunk(
-  "categories/update",
-  async (category) => {
-    const data = await PutData(category, `/categories/${category.id}/`);
-    return data;
+  "categories/updateCategory",
+  async (formData) => {
+    const id = formData.get("id");
+    const response = await axios.put(`/api/categories/${id}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response.data;
   }
 );
 
@@ -32,7 +46,6 @@ export const deleteCategory = createAsyncThunk(
     return id;
   }
 );
-
 
 const categoriesSlice = createSlice({
   name: "categories",
