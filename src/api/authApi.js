@@ -14,8 +14,6 @@ export const GetData = async (tree) => {
   return response.data;
 };
 
-
-
 export const DeleteData = async (tree, id) => {
   const response = await axios.delete(`${API_URL}${tree}${id}`);
   return response.data;
