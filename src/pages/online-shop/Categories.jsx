@@ -1,3 +1,4 @@
+import CategoryForm from "@/components/shared/Forms/CategoryForm";
 import {
   Table,
   TableBody,
@@ -8,287 +9,133 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import {
-  fetchCategories,
-  addCategory,
-  updateCategory,
-  deleteCategory,
-} from "@/features/categories/Categories";
-import { Delete, Image, Pen, Trash, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCategories } from "@/hooks/useCategories";
+import { Pen, Trash2, X } from "lucide-react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
-import { useDispatch, useSelector } from "react-redux";
 
-function ProductsCategories() {
+export default function ProductsCategories() {
   const { t } = useTranslation();
-  const categories = useSelector((state) => state.categories.list);
-  const dispatch = useDispatch();
+  const {
+    data: categories = [],
+    isLoading,
+    deleteCategoryMutation,
+  } = useCategories();
+
   const [showForm, setShowForm] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editingId, setEditingId] = useState(null);
-  const [productForm, setProductForm] = useState({
-    title: "",
-    status: "",
-    description: "",
-    items: "",
-    imageFile: null,
-    image: "",
-  });
+  const [editingCategory, setEditingCategory] = useState(null);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setProductForm({ ...productForm, [name]: value });
-  };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Clean up previous preview URL
-    if (productForm.image) {
-      URL.revokeObjectURL(productForm.image);
-    }
-
-    const previewURL = URL.createObjectURL(file);
-
-    setProductForm((prev) => ({
-      ...prev,
-      imageFile: file,
-      image: previewURL,
-    }));
-  };
-
-  useEffect(() => {
-    dispatch(fetchCategories());
-  }, [dispatch]);
-
-  const handleSave = () => {
-    const { title, description, imageFile, status } = productForm;
-    if (!title || !description || status === "") {
-      alert("Please fill in all fields.");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("name", title);
-    formData.append("description", description);
-    formData.append("image", imageFile);
-    formData.append("status", true);
-
-    if (isEditing) {
-      formData.append("id", editingId); // Add ID for update
-      dispatch(updateCategory(formData));
-    } else {
-      dispatch(addCategory(formData));
-    }
-
-    resetForm();
-  };
-
-  const handleEdit = (product) => {
-    setProductForm({
-      title: product.title,
-      description: product.description,
-      price: product.price,
-      items: product.items,
-      imageFile: null,
-      image: product.image,
-    });
-    setIsEditing(true);
-    setEditingId(product.id);
+  const handleEdit = (category) => {
+    setEditingCategory(category);
     setShowForm(true);
   };
 
   const handleDelete = (id) => {
     if (confirm("Are you sure you want to delete this category?")) {
-      dispatch(deleteCategory(id));
+      deleteCategoryMutation.mutate(id);
     }
   };
-  const resetForm = () => {
-    setProductForm({
-      title: "",
-      description: "",
-      price: "",
-      items: "",
-      imageFile: null,
-      image: "",
-    });
-    setIsEditing(false);
-    setEditingId(null);
+
+  const handleFormSuccess = () => {
     setShowForm(false);
+    setEditingCategory(null);
   };
 
   return (
     <div className="max-w-6xl mx-auto p-6 dark:bg-[#222122] dark:text-white">
-      <div className="flex justify-between items-center mb-6  dark:bg-[#222122] dark:text-white">
-        <h1 className="text-2xl font-bold">Категории</h1>
-        <button
-          className="bg-green-600 text-white px-5 py-2 rounded"
-          onClick={() => {
-            setProductForm({
-              title: "",
-              description: "",
-              price: "",
-              items: "",
-              imageFile: null,
-              image: "",
-            });
-            setIsEditing(false);
-            setShowForm(true);
-          }}
-        >
-          {isEditing ? "Редактировать" : "Создать категорию"}
-        </button>
-      </div>
-
-      {showForm && (
-        <div className="bg-white p-6 border rounded shadow mb-10  dark:bg-[#222122] dark:text-white">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="space-y-6">
-              <div className="border rounded p-4 flex flex-col items-center text-center">
-                <label className="block font-semibold mb-1">
-                  Фото (1080x1440)
-                </label>
-                <div className="relative w-40 h-40 border border-dashed dark:bg-[#2a2a2a]  rounded flex items-center justify-center bg-gray-50">
-                  {productForm.image ? (
-                    <img
-                      src={productForm.image}
-                      alt="Preview"
-                      className="w-full h-full object-cover rounded"
-                    />
-                  ) : (
-                    <Image className="w-[160px] dark:text-white h-[120px] text-gray-500" />
-                  )}
-                  <label
-                    htmlFor="image-upload"
-                    className="absolute top-1 right-1 bg-white p-1 rounded-full shadow cursor-pointer"
-                  >
-                    <Pen className="w-4 h-4 text-gray-600" />
-                  </label>
-                  <input
-                    id="image-upload"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="hidden"
-                  />
-                </div>
-                <p className="text-xs text-gray-500 mt-2">
-                  Принимаются только файлы изображений *.png, *.jpg и *.jpeg
-                  размером не более 2 мегабайт.
-                </p>
-              </div>
-              <div className="mt-4 border p-4 rounded mb-6">
-                <label className="block font-semibold mb-1">Статус</label>
-                <div className="flex items-center gap-2">
-                  <span className="h-3 w-3  rounded-full bg-green-500 inline-block" />
-                  <select
-                    className="border dark:bg-[#2a2a2a] rounded px-3 py-2"
-                    value={productForm.status || "active"}
-                    onChange={(e) =>
-                      setProductForm({ ...productForm, status: e.target.value })
-                    }
-                  >
-                    <option value={false}>Активный</option>
-                    <option value={true}>Неактивный</option>
-                  </select>
-                </div>
-                <p className="text-xs text-gray-500 mt-1">
-                  Установите статус категории.
-                </p>
-              </div>
-            </div>
-            <div className="md:col-span-2 space-y-6">
-              <label className="block font-semibold mb-1">Наименование</label>
-              <input
-                name="title"
-                type="text"
-                value={productForm.title}
-                onChange={handleChange}
-                className="dark:placeholder:text-white w-full border px-3 py-2 placeholder:text-black  text-black rounded mb-4 dark:bg-[#222122] dark:text-white placeholder:text-white"
-                placeholder="Введите наименование"
-              />
-              <label className="block font-semibold mb-1">Описание</label>
-              <ReactQuill
-                theme="snow"
-                value={productForm.description}
-                onChange={(value) =>
-                  setProductForm({ ...productForm, description: value })
-                }
-                className="mb-4"
-              />
-            </div>
+      {isLoading ? (
+        <div className="flex items-baseline justify-center gap-5">
+          <div class="loader ">
+            <div class="loader__bar "></div>
+            <div class="loader__bar"></div>
+            <div class="loader__bar"></div>
+            <div class="loader__bar"></div>
+            <div class="loader__bar"></div>
+            <div class="loader__ball"></div>
           </div>
-
-          <div className="flex gap-4">
-            <button
-              onClick={handleSave}
-              className="bg-green-600 text-white px-6 py-2 rounded"
-            >
-              {isEditing ? "Обновить" : "Сохранить"}
-            </button>
-            <button
-              onClick={() => setShowForm(false)}
-              className="bg-gray-300 text-black px-6 py-2 rounded"
-            >
-              Отмена
-            </button>
+          <p className="text-2xl">Loading categories</p>
+          <div class="wrapper ">
+            <div class="circle"></div>
+            <div class="circle"></div>
+            <div class="circle"></div>
           </div>
         </div>
-      )}
-      {categories.length > 0 && (
-        <div className="shadow-xl rounded p-3  dark:bg-[#222122] dark:text-white">
-          <Table>
-            <TableCaption>A list of your recent invoices.</TableCaption>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[100px]">Image</TableHead>
-                <TableHead>Title</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead className="text-right">Tools</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {categories.map((i) => (
-                <TableRow key={i.title}>
-                  <TableCell className="font-medium">
-                    <img
-                      className="w-[60px] h-[60px] object-cover"
-                      src={i.image}
-                      alt={i.title}
-                    />
-                  </TableCell>
-                  <TableCell className="font-medium">{i.title}</TableCell>
-                  <TableCell>
-                    {i.date ? new Date(i.date).toLocaleDateString() : "—"}
-                  </TableCell>
+      ) : categories.length > 0 ? (
+        <div>
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-2xl font-bold">Категории</h1>
+            <button
+              className="bg-green-600 text-white px-5 py-2 rounded"
+              onClick={() => {
+                setEditingCategory(null);
+                X;
+                setShowForm(true);
+              }}
+            >
+              {editingCategory ? "Редактировать" : "Создать категорию"}
+            </button>
+          </div>
 
-                  <TableCell className="text-right">
-                    <div className="flex gap-2 justify-end">
-                      <button
-                        onClick={() => handleEdit(i)}
-                        className="text-yellow-400 gap-1 flex items-center text-white px-4 py-1 rounded"
-                      >
-                        <Pen className="w-4 h-4" /> Редактировать
-                      </button>
-                      <button
-                        onClick={() => handleDelete(i.id)}
-                        className="text-red-500 gap-1 flex items-center px-4 py-1 rounded"
-                      >
-                        <Trash2 className="w-4 h-4" /> Удалить
-                      </button>
-                    </div>
-                  </TableCell>
+          {showForm && (
+            <div className="mb-6">
+              <CategoryForm
+                initialData={editingCategory}
+                onSuccess={handleFormSuccess}
+              />
+            </div>
+          )}
+          <div className="shadow-xl rounded p-3 dark:bg-[#222122] dark:text-white">
+            <Table>
+              <TableCaption>A list of your recent categories.</TableCaption>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[100px]">Image</TableHead>
+                  <TableHead>Title</TableHead>
+                  <TableHead>Description</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Tools</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {categories.map((cat) => (
+                  <TableRow key={cat.id}>
+                    <TableCell>
+                      <img
+                        className="w-[60px] h-[60px] object-cover rounded"
+                        src={cat.image}
+                        alt={cat.name}
+                      />
+                    </TableCell>
+                    <TableCell>{cat.name}</TableCell>
+                    <TableCell>
+                      <p>{cat.description}</p>
+                    </TableCell>
+                    <TableCell>{cat.status}</TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex gap-2 justify-end">
+                        <button
+                          onClick={() => handleEdit(cat)}
+                          className="text-yellow-400 gap-1 flex items-center px-4 py-1 rounded"
+                        >
+                          <Pen className="w-4 h-4" /> Редактировать
+                        </button>
+                        <button
+                          onClick={() => handleDelete(cat.id)}
+                          className="text-red-500 gap-1 flex items-center px-4 py-1 rounded"
+                        >
+                          <Trash2 className="w-4 h-4" /> Удалить
+                        </button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </div>
+      ) : (
+        <p className="">No categories found.</p>
       )}
     </div>
   );
 }
-
-export default ProductsCategories;
