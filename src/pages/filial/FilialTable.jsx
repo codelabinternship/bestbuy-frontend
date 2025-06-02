@@ -59,10 +59,9 @@ function Filials() {
       dispatch(updateFilial({ branch_id: editingId, ...newFilial }));
       fetchProducts;
     } else {
-      await PostData("/branches/", newFilial);
+      await PostData(newFilial, "/branches/");
       dispatch(addFilial(newFilial));
     }
-
     resetForm();
   };
 
