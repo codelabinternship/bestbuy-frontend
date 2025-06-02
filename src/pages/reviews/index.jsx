@@ -1,85 +1,78 @@
-import React, { useEffect, useState } from "react";
 import {
-    Table,
-    TableBody,
-    TableCaption,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
-import { Delete, Icon, ShoppingBasket, Trash2 } from "lucide-react";
-import { DeleteData, GetData } from "@/api/authApi";
-import axios from "axios";
+import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useReviews } from "@/hooks/useReviews";
+import { useState } from "react";
 
-const Reviews = () => {
-    const [reviews, setReviews] = useState([])
+export default function ReviewsTable() {
+  const { reviews, deleteReview, isLoading } = useReviews();
+  const [expandedId, setExpandedId] = useState(null);
 
-    useEffect(() => {
-        const fetchReviews = async () => {
-            const data = await GetData("/api/reviews/");
-            setReviews(data);
-        };
-        fetchReviews();
-    }, []);
+  if (isLoading) return <p>Loading reviews...</p>;
 
-    const [expanded, setExpanded] = useState("");
-    const toggleExpand = (id) => {
-
-        setExpanded(id);
-    };
-    const handleDelete = async (id) => {
-        const response = await DeleteData("/api/reviews/", id+"/");
-      
-    }
-
-    return (
-        <div>
-            <div className="m-6 mb-12 text-xl font-semibold">Boshqaruv Paneli</div>
-            <Table className>
-                <TableCaption>Yaqinda yozilgan sharhlaringiz.</TableCaption>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead >ID</TableHead>
-                        <TableHead >Ism</TableHead>
-                        <TableHead>Sharh</TableHead>
-                        <TableHead>Harakatlar</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {reviews.map((review) => (
-                        <TableRow key={review.comment}>
-                            <TableCell className="font-medium">{review.review_id}</TableCell>
-                            <TableCell>{review.comment}</TableCell>
-                            <TableCell>
-                                <p
-                                    onClick={() => toggleExpand(review.review_id)}
-                                    className={`${expanded === review.review_id ? "" : "line-clamp-1 !overflow-hidden  w-[250px]"} `}>
-                                    {review.comment}
-                                </p>
-                                <div>
-                                    <button
-                                        onClick={() => toggleExpand(null)}
-                                        className="text-blue-600 mt-2"
-                                    >
-                                        {expanded === review.review_id ? "Yashirish" : ""}
-                                    </button>
-                                </div>
-
-                            </TableCell>
-                            <TableCell>
-                                <Button onClick={()=>handleDelete(review.review_id)}  variant="outline" className="bg-transparent" >
-                                    <Trash2 className="" />
-                                </Button>
-                            </TableCell>
-
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-        </div>
-    );
-};
-
-export default Reviews;
+  return (
+    <div>
+      <h2 className="m-6 mb-12 text-xl font-semibold">Boshqaruv Paneli</h2>
+      <Table>
+        <TableCaption>Yaqinda yozilgan sharhlaringiz.</TableCaption>
+        <TableHeader>
+          <TableRow>
+            <TableHead>ID</TableHead>
+            <TableHead>Ism</TableHead>
+            <TableHead>Sharh</TableHead>
+            <TableHead>Harakatlar</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {reviews.map((review) => (
+            <TableRow key={review.review_id}>
+              <TableCell>{review.review_id}</TableCell>
+              <TableCell>{review.name || "Ism mavjud emas"}</TableCell>
+              <TableCell>
+                <div
+                  className={`${
+                    expandedId === review.review_id
+                      ? ""
+                      : "line-clamp-1 overflow-hidden w-[250px]"
+                  }`}
+                  onClick={() =>
+                    setExpandedId(
+                      expandedId === review.review_id ? null : review.review_id
+                    )
+                  }
+                >
+                  {review.comment}
+                </div>
+                {expandedId === review.review_id && (
+                  <button
+                    onClick={() => setExpandedId(null)}
+                    className="text-blue-600 text-sm mt-1"
+                  >
+                    Yashirish
+                  </button>
+                )}
+              </TableCell>
+              <TableCell>
+                <Button
+                  onClick={() => deleteReview(review.review_id)}
+                  variant="outline"
+                  className="bg-transparent"
+                >
+                  <Trash2 />
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  );
+}
