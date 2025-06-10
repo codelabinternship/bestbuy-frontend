@@ -18,8 +18,16 @@ import CreateAccount from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
 import Loyality from "./pages/paying-system/Loyality";
 import Tranzactions from "./pages/paying-system/Tranzactions";
+import Cookies from "js-cookie";
 
-const isAuthenticated = () => true;
+const isAuthenticated = () => {
+  const token = Cookies.get("token") || localStorage.getItem("token");
+  if (token) {
+    return true;
+  } else {
+    return false;
+  }
+};
 
 const Layout = ({ children }) => (
   <div className="[--header-height:calc(theme(spacing.14))]">
@@ -48,8 +56,14 @@ export default function Page() {
     <BrowserRouter>
       <ThemeProvider defaultTheme="light" storageKey="admin-key">
         <Routes>
-          <Route path="/login" element={<CreateAccount />} />
-          <Route path="/register" element={<Register />} />
+          <Route
+            path="/login"
+            element={<PrivateRoute element={<CreateAccount />} />}
+          />
+          <Route
+            path="/register"
+            element={<PrivateRoute element={<Register />} />}
+          />
           <Route path="/" element={<PrivateRoute element={<Models />} />} />
           <Route path="/users" element={<PrivateRoute element={<Users />} />} />
           <Route path="/sales" element={<PrivateRoute element={<Sales />} />} />

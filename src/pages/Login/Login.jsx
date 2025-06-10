@@ -2,27 +2,26 @@ import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Eye, EyeOff, Facebook, Github, Twitter } from "lucide-react";
+import { useLogin } from "@/hooks/auth/useAuth";
+import { useNavigate } from "react-router-dom";
 
 export default function SignIn() {
-  const [passwordVisible, setPasswordVisible] = useState(false);
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-
+  const { mutate, isLoading, error } = useLogin();
+  const [passwordVisible, setPasswordVisible] = useState();
+  const [form, setForm] = useState({ email: "", password: "" });
+  const navigate = useNavigate();
+  
   const handleSubmit = (e) => {
+    navigate("/");
     e.preventDefault();
-    if (!password) {
-      setError("Password is required");
-    } else {
-      setError("");
-      // Submit logic
-    }
+    mutate(form);
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex ">
       {/* Left Panel - Form */}
-      <div className="w-full md:w-1/2 flex items-center justify-center p-8 bg-white">
-        <div className="max-w-md w-full space-y-6">
+      <div className="w-full md:w-1/2 flex items-center dark:bg-black dark:text-white justify-center p-8 bg-white">
+        <div className="max-w-md w-full  space-y-6">
           <img
             src="https://avatars.mds.yandex.net/i?id=0a32d2f753e665ef23329b8668d1f844_l-10653027-images-thumbs&n=13"
             alt="Logo"
@@ -30,8 +29,10 @@ export default function SignIn() {
           />
 
           <div>
-            <h2 className="text-3xl font-bold text-gray-900">Sign in</h2>
-            <p className="mt-1 text-sm text-gray-500">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+              Sign in
+            </h2>
+            <p className="mt-1 text-sm text-gray-500 dark:text-white  ">
               Don’t have an account?{" "}
               <a href="/register" className="text-indigo-600 font-medium">
                 Sign up
@@ -39,12 +40,18 @@ export default function SignIn() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5 dark:bg-black">
             <div>
-              <label className="text-sm font-medium text-gray-700 block mb-1">
+              <label className="text-sm dark:text-white font-medium text-gray-700 block mb-1">
                 Email address
               </label>
-              <Input type="email" placeholder="you@example.com" required />
+              <Input
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                type="email"
+                placeholder="you@example.com"
+                required
+              />
             </div>
 
             <div>
@@ -54,8 +61,10 @@ export default function SignIn() {
               <div className="relative">
                 <Input
                   type={passwordVisible ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={form.password}
+                  onChange={(e) =>
+                    setForm({ ...form, password: e.target.value })
+                  }
                   className={`pr-10 ${error ? "border-red-500" : ""}`}
                 />
                 <button
@@ -69,7 +78,7 @@ export default function SignIn() {
               {error && <p className="text-sm text-red-500 mt-1">{error}</p>}
             </div>
 
-            <div className="flex items-center justify-between">
+            {/* <div className="flex items-center justify-between">
               <label className="flex items-center space-x-2 text-sm">
                 <input type="checkbox" className="form-checkbox" />
                 <span>Remember me</span>
@@ -77,7 +86,7 @@ export default function SignIn() {
               <a href="#" className="text-sm text-indigo-600 hover:underline">
                 Forgot password?
               </a>
-            </div>
+            </div> */}
 
             <Button
               type="submit"
