@@ -6,3 +6,4 @@ export function QueryProvider({ children }) {
 
   return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
 }
+  

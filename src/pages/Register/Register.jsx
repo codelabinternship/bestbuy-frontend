@@ -5,17 +5,24 @@ import { Eye, EyeOff, Github, Facebook, Twitter } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../app/store";
 import { register } from "../../features/auth/authSlice";
 import { PostData } from "@/api/authApi";
+import { useRegister } from "@/hooks/auth/useAuth";
+import { useNavigate } from "react-router-dom";
 
 export default function Register() {
-  const dispatch = useAppDispatch();
-  const { loading, error } = useAppSelector((state) => state.auth);
-
+  const { mutate, isLoading, error } = useRegister();
   const [formData, setFormData] = useState({
-    fullName: "",
+    user_name: "",
+    phone_number: "111111",
     email: "",
     password: "",
-    company: "",
+    market_name: "",
   });
+  const navigate = useNavigate();
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    navigate("/");
+    mutate(formData);
+  };
 
   const [formErrors, setFormErrors] = useState({});
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -24,39 +31,6 @@ export default function Register() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const newErrors = {};
-    if (!formData.fullName) newErrors.fullName = "Full name is required";
-    if (!formData.email) newErrors.email = "Email is required";
-    if (!formData.password) newErrors.password = "Password is required";
-    if (!formData.company) newErrors.company = "Company is required";
-
-    setFormErrors(newErrors);
-    console.log("asdfsfd");
-    try {
-      const response = await PostData(
-        {
-          user_name: "test",
-          phone_number: "fasdf",
-          email: "testx8@gmail.com",
-          password: "qwerty123",
-          market_name: "fddsaf",
-        },
-        "/api/auth/register/"
-      );
-
-      return response;
-    } catch (err) {
-      // return rejectWithValue(
-      //   err.response?.data?.message || "Registration failed"
-    }
-
-    // dispatch(register(formData));
-    // if (Object.keys(newErrors).length === 0) {
-    // }
-  };
   // handleSubmit();
 
   return (
@@ -85,30 +59,38 @@ export default function Register() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Full Name */}
             <div>
-              <label className="text-sm font-medium block mb-1">
+              <label className="text-sm text-black font-medium block mb-1">
                 Full name
               </label>
               <Input
+                name="user_name"
                 type="text"
-                name="fullName"
-                value={formData.fullName}
+                value={formData.user_name}
                 onChange={handleChange}
-                className={formErrors.fullName ? "border-red-500" : ""}
+                className={
+                  formErrors.user_name
+                    ? "border-red-500 text-black"
+                    : "text-black"
+                }
               />
-              {formErrors.fullName && (
-                <p className="text-sm text-red-500">{formErrors.fullName}</p>
+              {formErrors.user_name && (
+                <p className="text-sm text-red-500">{formErrors.user_name}</p>
               )}
             </div>
 
             {/* Email */}
             <div>
-              <label className="text-sm font-medium block mb-1">Email</label>
+              <label className="text-sm font-medium text-black block mb-1">
+                Email
+              </label>
               <Input
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className={formErrors.email ? "border-red-500" : ""}
+                className={
+                  formErrors.email ? "border-red-500 text-black" : "text-black"
+                }
               />
               {formErrors.email && (
                 <p className="text-sm text-red-500">{formErrors.email}</p>
@@ -117,7 +99,9 @@ export default function Register() {
 
             {/* Password */}
             <div>
-              <label className="text-sm font-medium block mb-1">Password</label>
+              <label className="text-sm text-black font-medium block mb-1">
+                Password
+              </label>
               <div className="relative">
                 <Input
                   type={passwordVisible ? "text" : "password"}
@@ -125,7 +109,9 @@ export default function Register() {
                   value={formData.password}
                   onChange={handleChange}
                   className={`pr-10 ${
-                    formErrors.password ? "border-red-500" : ""
+                    formErrors.password
+                      ? "border-red-500 text-black"
+                      : "text-black"
                   }`}
                 />
                 <button
@@ -143,26 +129,31 @@ export default function Register() {
 
             {/* Company */}
             <div>
-              <label className="text-sm font-medium block mb-1">Company</label>
+              <label className="text-sm text-black font-medium block mb-1">
+                Company
+              </label>
               <Input
                 type="text"
-                name="company"
-                value={formData.company}
+                name="market_name"
+                value={formData.market_name}
                 onChange={handleChange}
-                className={formErrors.company ? "border-red-500" : ""}
+                className={
+                  formErrors.market_name
+                    ? "border-red-500 text-black"
+                    : "text-black"
+                }
               />
               {formErrors.company && (
-                <p className="text-sm text-red-500">{formErrors.company}</p>
+                <p className="text-sm text-red-500">{formErrors.market_name}</p>
               )}
             </div>
 
             {/* Submit */}
             <Button
               type="submit"
-              // disabled={loading}
               className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-full"
             >
-              {loading ? "Creating..." : "Create Account"}
+              {isLoading ? "Creating..." : "Create Account"}
             </Button>
 
             {/* API Error */}

@@ -97,7 +97,7 @@ export default function ProductForm({ initialData = null, onSuccess }) {
         <label>Price *</label>
         <input
           type="number"
-          step="0.01"
+          step=""
           name="price"
           value={formData.price}
           onChange={handleChange}
@@ -109,7 +109,7 @@ export default function ProductForm({ initialData = null, onSuccess }) {
         <label>Discount Price</label>
         <input
           type="number"
-          step="0.01"
+          step=""
           name="discount_price"
           value={formData.discount_price}
           onChange={handleChange}

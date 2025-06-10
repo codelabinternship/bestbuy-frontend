@@ -55,7 +55,7 @@ export default function ProductsList() {
           </div>
           <p className="text-2xl">Loading products...</p>
         </div>
-      ) : products.length > 0 ? (
+      ) : products.length >= 0 ? (
         <div>
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold">Продукты</h1>
