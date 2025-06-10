@@ -1,18 +1,25 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Eye, EyeOff, Facebook, Github, Twitter } from "lucide-react";
 import { useLogin } from "@/hooks/auth/useAuth";
 import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 export default function SignIn() {
   const { mutate, isLoading, error } = useLogin();
   const [passwordVisible, setPasswordVisible] = useState();
   const [form, setForm] = useState({ email: "", password: "" });
   const navigate = useNavigate();
-  
+
+  useEffect(() => {
+    const token = Cookies.get("token") || localStorage.getItem("token");
+    if (token) {
+      navigate("/");
+    }
+  }, []);
+
   const handleSubmit = (e) => {
-    navigate("/");
     e.preventDefault();
     mutate(form);
   };
@@ -55,7 +62,7 @@ export default function SignIn() {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-700 block mb-1">
+              <label className="text-sm font-medium dark:text-white text-gray-700 block mb-1">
                 Password
               </label>
               <div className="relative">
