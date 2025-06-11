@@ -211,7 +211,7 @@ export default function ProductWithVariationsForm({
                   />
                 </div>
                 <Button type="submit" disabled={loading} className="w-full">
-                  {loading ? "Saving..." : "Save & Continue to Variations"}
+                  {loading ? "Saving.." : "Save & Continue to Variations"}
                 </Button>
               </form>
             </CardContent>
