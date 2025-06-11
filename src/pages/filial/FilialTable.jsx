@@ -35,75 +35,75 @@ function Filials() {
     status: "",
   });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFilialForm({ ...filialForm, [name]: value });
-  };
+  // const handleChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setFilialForm({ ...filialForm, [name]: value });
+  // };
 
-  const handleSave = async () => {
-    const { name, geo_location, address, status } = filialForm;
-    if (!name || !geo_location || !address) {
-      alert("Barcha maydonlarni to'ldiring.");
-      return;
-    }
+  // const handleSave = async () => {
+  //   const { name, geo_location, address, status } = filialForm;
+  //   if (!name || !geo_location || !address) {
+  //     alert("Barcha maydonlarni to'ldiring.");
+  //     return;
+  //   }
 
-    const newFilial = {
-      ...filialForm,
-      working_hours: "11",
-      description: "dADSASS",
-      phone: "1234567",
-    };
+  //   const newFilial = {
+  //     ...filialForm,
+  //     working_hours: "11",
+  //     description: "dADSASS",
+  //     phone: "1234567",
+  //   };
 
-    if (isEditing) {
-      await PutData("/branches/", `${editingId}/`, newFilial);
-      dispatch(updateFilial({ branch_id: editingId, ...newFilial }));
-      fetchProducts;
-    } else {
-      await PostData(newFilial, "/branches/");
-      dispatch(addFilial(newFilial));
-    }
-    resetForm();
-  };
+  //   if (isEditing) {
+  //     await PutData("/branches/", `${editingId}/`, newFilial);
+  //     dispatch(updateFilial({ branch_id: editingId, ...newFilial }));
+  //     fetchProducts;
+  //   } else {
+  //     await PostData(newFilial, "/branches/");
+  //     dispatch(addFilial(newFilial));
+  //   }
+  //   resetForm();
+  // };
 
-  const handleEdit = (filial) => {
-    setFilialForm({
-      name: filial.name,
-      geo_location: filial.geo_location,
-      address: filial.address,
-      status: filial.status,
-    });
-    setEditingId(filial.branch_id);
-    setIsEditing(true);
-    setShowForm(true);
-  };
+  // const handleEdit = (filial) => {
+  //   setFilialForm({
+  //     name: filial.name,
+  //     geo_location: filial.geo_location,
+  //     address: filial.address,
+  //     status: filial.status,
+  //   });
+  //   setEditingId(filial.branch_id);
+  //   setIsEditing(true);
+  //   setShowForm(true);
+  // };
 
-  const handleDelete = (id) => {
-    console.log(id);
+  // const handleDelete = (id) => {
+  //   console.log(id);
 
-    if (confirm("Haqiqatan ham o'chirmoqchimisiz?")) {
-      dispatch(deleteFilial(id));
-    }
-  };
+  //   if (confirm("Haqiqatan ham o'chirmoqchimisiz?")) {
+  //     dispatch(deleteFilial(id));
+  //   }
+  // };
 
-  const resetForm = () => {
-    setFilialForm({
-      name: "",
-      geo_location: "",
-      address: "",
-      status: "active",
-    });
-    setIsEditing(false);
-    setEditingId(null);
-    setShowForm(false);
-  };
-  const fetchProducts = async () => {
-    const data = await GetData("/branches/");
-    setFilials(data);
-  };
-  useEffect(() => {
-    fetchProducts();
-    console.log(filials);
-  }, [dispatch]);
+  // const resetForm = () => {
+  //   setFilialForm({
+  //     name: "",
+  //     geo_location: "",
+  //     address: "",
+  //     status: "active",
+  //   });
+  //   setIsEditing(false);
+  //   setEditingId(null);
+  //   setShowForm(false);
+  // };
+  // const fetchProducts = async () => {
+  //   const data = await GetData("/branches/");
+  //   setFilials(data);
+  // };
+  // useEffect(() => {
+  //   fetchProducts();
+  //   console.log(filials);
+  // }, [dispatch]);
 
   return (
     <div className="max-w-6xl mx-auto p-6 dark:bg-[#222122] dark:text-white">

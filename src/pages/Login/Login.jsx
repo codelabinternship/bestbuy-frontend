@@ -10,6 +10,7 @@ export default function SignIn() {
   const { mutate, isLoading, error } = useLogin();
   const [passwordVisible, setPasswordVisible] = useState();
   const [form, setForm] = useState({
+    user_name: "Ibrohim",
     email: "",
     password: "",
   });

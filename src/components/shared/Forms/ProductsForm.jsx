@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import { useProducts } from "@/hooks/useProducts";
 import { useCategories } from "@/hooks/useCategories";
 import api from "@/lib/axios";
+import { useVariations } from "@/hooks/useVariations";
 
 export default function ProductWithVariationsForm({
   initialData = null,
@@ -29,7 +30,8 @@ export default function ProductWithVariationsForm({
     image: null,
   });
   const [imagePreview, setImagePreview] = useState(null);
-
+  const { addVariationMutation, updateVariationMutation } =
+    useVariations(productId);
   const [variations, setVariations] = useState({
     option_name: "",
     option_value: "",
@@ -113,14 +115,21 @@ export default function ProductWithVariationsForm({
     if (!productId) return;
     setLoading(true);
     setError("");
+    // if (editing) {
+    //   updateVariationMutation.mutate({
+    //     variation_id: editing.variation_id,
+    //     formData: payload,
+    //   });
+    // } else {
+    // }
     try {
       console.log(variations);
       const newData = {
         product_id: productId,
         ...variations,
       };
-      const res = await api.post(`/variations/`, newData);
-      if (!res.data) throw new Error("Failed to create variations");
+      addVariationMutation.mutate(newData);
+      // if (!res.data) throw new Error("Failed to create variations");
       alert("Variations created successfully!");
       setStep(1);
       setFormData({ name: "", price: "", description: "" });
@@ -250,24 +259,24 @@ export default function ProductWithVariationsForm({
                       onChange={(e) => handleVariationChange(e)}
                     />
                   </div>
-                  {/* <Button
-                      type="button"
-                      variant="ghost"
-                      onClick={() => removeVariation(index)}
-                      className="self-center text-red-600"
-                    >
-                      Remove
-                    </Button> */}
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    // onClick={() => removeVariation(index)}
+                    className="self-center text-red-600"
+                  >
+                    Remove
+                  </Button>
                 </div>
 
-                {/* <Button
+                <Button
                   type="button"
                   variant="secondary"
-                  onClick={addVariation}
+                  // onClick={addVariation}
                   className="w-full"
                 >
                   + Add Another Variation
-                </Button> */}
+                </Button>
                 <Button type="submit" disabled={loading} className="w-full">
                   {loading ? "Saving..." : "Save Variations"}
                 </Button>

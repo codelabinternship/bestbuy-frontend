@@ -3,10 +3,10 @@ import Cookies from "js-cookie";
 
 export const useAuthStore = create((set) => ({
   user: null,
-  token: Cookies.get("token") || null,
+  token: Cookies.get("token") || localStorage.getItem("token"),
   setUser: (user) => set({ user }),
   setToken: (token) => {
-    Cookies.set("token", token, { expires: 7 }); // 7 kunlik cookie
+    Cookies.set("token", token, { expires: 20 }); // 20 kunlik cookie
     set({ token });
   },
   logout: () => {

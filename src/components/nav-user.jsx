@@ -26,6 +26,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Link } from "react-router-dom";
+import Cookies from "js-cookie";
 
 export function NavUser({ user }) {
   const { isMobile } = useSidebar();
@@ -39,10 +40,8 @@ export function NavUser({ user }) {
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">AN</AvatarFallback>
-              </Avatar>
+              <img className="w-12 h-8" src={user.avatar} alt={user.name} />
+
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">{user.name}</span>
                 <span className="truncate text-xs">{user.email}</span>
@@ -51,17 +50,19 @@ export function NavUser({ user }) {
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+            className="w-[--radix-dropdown-menu-trigger-width] bg-white min-w-56 rounded-lg"
             side={isMobile ? "bottom" : "right"}
             align="end"
             sideOffset={4}
           >
-            <DropdownMenuLabel className="p-0 font-normal">
-              <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
-                </Avatar>
+            <DropdownMenuLabel className="p-0 font-normal bg-gray-50">
+              <div className="flex items-center justify-between gap-2 px-1 py-1.5 text-left text-sm">
+                <img
+                  className="w-12 h-8 rounded bg-white"
+                  src={user.avatar}
+                  alt={user.name}
+                />
+
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">{user.name}</span>
                   <span className="truncate text-xs">{user.email}</span>
@@ -92,7 +93,13 @@ export function NavUser({ user }) {
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <Link className="flex items-center gap-2" to="/login">
+              <Link
+                onClick={() => {
+                  Cookies.remove("token");
+                }}
+                className="flex items-center gap-2"
+                to="/login"
+              >
                 <LogOut size={16} />
                 Log out
               </Link>

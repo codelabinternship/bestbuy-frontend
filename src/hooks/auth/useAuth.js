@@ -9,7 +9,7 @@ export const useLogin = () => {
   const navigate = useNavigate();
   return useMutation(login, {
     onSuccess: (data) => {
-      setToken(data.access_token);
+      setToken(data.access);
       setUser(data.user);
       navigate("/");
       queryClient.invalidateQueries("me");
@@ -23,7 +23,7 @@ export const useRegister = () => {
 
   return useMutation(register, {
     onSuccess: (data) => {
-      setToken(data.access_token);
+      setToken(data.access);
       setUser(data.user);
       navigate("/");
       queryClient.invalidateQueries("me");

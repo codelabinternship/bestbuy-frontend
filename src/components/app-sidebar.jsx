@@ -7,10 +7,7 @@ import {
   Send,
   Store,
   ShoppingBag,
-  Turtle,
   Star,
-  SquareFunction,
-  ChartNoAxesColumn,
   HandCoins,
   Truck,
   MapPin,
@@ -31,13 +28,8 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { useTranslation } from "react-i18next";
-
+import { useMe } from "@/hooks/useMe";
 const data = {
-  user: {
-    name: "Ibrohim",
-    email: "example@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
   navMain: [
     {
       title: "Dashboard",
@@ -140,52 +132,6 @@ const data = {
         },
       ],
     },
-    // {
-    //   title: "Loyalty Program",
-    //   url: "/rewievs",
-    //   icon: SquareFunction,
-    //   isActive: true,
-    //   isAccardion: true,
-    //   acardionItems: [
-    //     {
-    //       title: "Scores",
-    //       url: "/loyality/scores",
-    //     },
-    //     {
-    //       title: "Analitics",
-    //       url: "/loyality/analitics",
-    //     },
-    //   ],
-    // },
-    // {
-    //   title: "Analitics",
-    //   url: "/rewievs",
-    //   icon: ChartNoAxesColumn,
-    //   isActive: true,
-    //   isAccardion: true,
-    //   acardionItems: [
-    //     {
-    //       title: "Analitics by orders",
-    //       url: "/loyality/scores",
-    //     },
-    //     {
-    //       title: "Analitics by views",
-    //       url: "/loyality/analitics",
-    //     },
-    //     {
-    //       title: "Analitics by products",
-    //       url: "/loyality/analitics",
-    //     },
-    //     {
-    //       title: "Analitics by carts",
-    //       url: "/loyality/analitics",
-    //     },
-    //     {
-    //       title: "Analitics by search responses",
-    //       url: "/loyality/analitics",
-    //     },
-    //   ],
-    // },
     {
       title: "Paying system",
       url: "/rewievs",
@@ -245,6 +191,8 @@ const data = {
 
 export function AppSidebar({ ...props }) {
   const { t } = useTranslation();
+  const { data: user, isLoading, isError } = useMe();
+
   return (
     <Sidebar
       className="top-[--header-height] !h-[calc(100svh-var(--header-height))] hover:overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 scrollbar-rounded"
@@ -256,13 +204,19 @@ export function AppSidebar({ ...props }) {
             <SidebarMenuButton size="lg" asChild>
               <a href="#">
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <img
-                    src="https://avatars.mds.yandex.net/i?id=0a32d2f753e665ef23329b8668d1f844_l-10653027-images-thumbs&n=13"
-                    alt="logo"
-                  />
+                  {user && (
+                    <img
+                      src={`http://127.0.0.1:8000${user.market.logo}`}
+                      alt="logo"
+                    />
+                  )}
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">Best Buy</span>
+                  {user && (
+                    <span className="truncate font-semibold">
+                      {user.market.name}
+                    </span>
+                  )}
                   <span className="truncate text-xs">{t("Dashboard")}</span>
                 </div>
               </a>
@@ -275,7 +229,25 @@ export function AppSidebar({ ...props }) {
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        {isLoading && (
+          <div className="p-4 text-sm text-gray-500">{t("Loading")}...</div>
+        )}
+
+        {isError && (
+          <div className="p-4 text-sm text-red-600">
+            {t("Could not load user")}
+          </div>
+        )}
+
+        {user && (
+          <NavUser
+            user={{
+              name: user.user.user_name,
+              email: user.user.email,
+              avatar: user.user.avatar || "/avatars/default.png",
+            }}
+          />
+        )}
       </SidebarFooter>
     </Sidebar>
   );

@@ -28,7 +28,7 @@ const isAuthenticated = () => {
     return false;
   }
 };
-
+// document.title = profile.market.name;
 const Layout = ({ children }) => (
   <div className="[--header-height:calc(theme(spacing.14))]">
     <SidebarProvider className="flex flex-col">
