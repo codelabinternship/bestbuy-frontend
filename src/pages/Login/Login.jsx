@@ -9,7 +9,10 @@ import Cookies from "js-cookie";
 export default function SignIn() {
   const { mutate, isLoading, error } = useLogin();
   const [passwordVisible, setPasswordVisible] = useState();
-  const [form, setForm] = useState({ email: "", password: "" });
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+  });
   const navigate = useNavigate();
 
   useEffect(() => {

@@ -1,4 +1,6 @@
 import ProductForm from "@/components/shared/Forms/ProductsForm";
+import ProductWithVariations from "@/components/shared/Forms/prva";
+import VariationManager from "@/components/shared/Variations/VariationManager";
 import {
   Table,
   TableBody,
@@ -36,9 +38,11 @@ export default function ProductsList() {
     }
   };
 
-  const handleFormSuccess = () => {
-    setShowForm(false);
+  const handleFormSuccess = (createdProduct) => {
     setEditingProduct(null);
+    setShowForm(false);
+    setProductId(createdProduct.id); // yangi qo‘shilgan product id
+    setShowVariationForm(true); // variations form ochiladi
   };
 
   return (
@@ -76,6 +80,7 @@ export default function ProductsList() {
                 initialData={editingProduct}
                 onSuccess={handleFormSuccess}
               />
+              {/* <ProductWithVariations/> */}
             </div>
           )}
           <div className="shadow-xl rounded p-3 dark:bg-[#222122] dark:text-white">
@@ -115,6 +120,7 @@ export default function ProductsList() {
                         >
                           <Trash2 className="w-4 h-4" /> Удалить
                         </button>
+                        <VariationManager productId={product.id} />
                       </div>
                     </TableCell>
                   </TableRow>
