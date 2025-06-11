@@ -11,30 +11,28 @@ import {
 } from "@/components/ui/table";
 import { Switch } from "@/components/ui/switch";
 import { Pen, Trash2 } from "lucide-react";
-import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import {
-  addPromocode,
-  updatePromocode,
-  deletePromocode,
-} from "../../features/promocodes/promocodesSlice";
+import { usePaymentMethods } from "@/hooks/usePaymentMethods"; // 👈 Hook yo'lini moslashtiring
 
 export default function Loyality() {
-  const dispatch = useDispatch();
-  const promocodes = useSelector((state) => state.promocodes.list);
+  const {
+    data: paymentMethods = [],
+    isLoading,
+    error,
+    addPaymentMethodMutation,
+    updatePaymentMethodMutation,
+    deletePaymentMethodMutation,
+  } = usePaymentMethods();
+
   const [showForm, setShowForm] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingId, setEditingId] = useState(null);
 
   const [form, setForm] = useState({
     name: "",
-    paymentMethod: "Naqd",
-    key: "",
-    serviceId: "",
-    inn: "",
-    extraInfo: "",
-    status: "active",
+    description: "",
+    status: true,
   });
 
   const handleChange = (e) => {
@@ -43,47 +41,45 @@ export default function Loyality() {
   };
 
   const handleSave = () => {
-    if (!form.name || !form.paymentMethod) {
+    if (!form.name || !form.description) {
       alert("Iltimos, barcha majburiy maydonlarni to'ldiring.");
       return;
     }
 
-    const newPromo = {
-      id: isEditing ? editingId : uuidv4(),
+    const newData = {
       ...form,
-      date: new Date().toISOString(),
     };
 
     if (isEditing) {
-      dispatch(updatePromocode(newPromo));
+      updatePaymentMethodMutation.mutate({
+        id: editingId,
+        updatedData: newData,
+      });
     } else {
-      dispatch(addPromocode(newPromo));
+      addPaymentMethodMutation.mutate(newData);
     }
+
     resetForm();
   };
 
-  const handleEdit = (promo) => {
-    setForm({ ...promo });
-    setEditingId(promo.id);
+  const handleEdit = (method) => {
+    setForm({ ...method });
+    setEditingId(method.payment_method_id);
     setIsEditing(true);
     setShowForm(true);
   };
 
   const handleDelete = (id) => {
     if (confirm("Haqiqatan ham o'chirmoqchimisiz?")) {
-      dispatch(deletePromocode(id));
+      deletePaymentMethodMutation.mutate(id);
     }
   };
 
   const resetForm = () => {
     setForm({
       name: "",
-      paymentMethod: "Naqd",
-      key: "",
-      serviceId: "",
-      inn: "",
-      extraInfo: "",
-      status: "active",
+      description: "",
+      status: true,
     });
     setIsEditing(false);
     setEditingId(null);
@@ -117,52 +113,11 @@ export default function Loyality() {
                 className="w-full border border-border dark:bg-background dark:text-foreground px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium">To'lov usuli</label>
-              <select
-                name="paymentMethod"
-                value={form.paymentMethod}
-                onChange={handleChange}
-                className="w-full border border-border dark:bg-background dark:text-foreground px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-primary"
-              >
-                <option value="Naqd">Naqd</option>
-                <option value="Karta">Karta</option>
-                <option value="Click">Click</option>
-                <option value="Payme">Payme</option>
-              </select>
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium">Kalit</label>
-              <input
-                name="key"
-                value={form.key}
-                onChange={handleChange}
-                className="w-full border border-border dark:bg-background dark:text-foreground px-3 py-2 rounded"
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium">Servis ID</label>
-              <input
-                name="serviceId"
-                value={form.serviceId}
-                onChange={handleChange}
-                className="w-full border border-border dark:bg-background dark:text-foreground px-3 py-2 rounded"
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium">INN</label>
-              <input
-                name="inn"
-                value={form.inn}
-                onChange={handleChange}
-                className="w-full border border-border dark:bg-background dark:text-foreground px-3 py-2 rounded"
-              />
-            </div>
             <div className="flex flex-col gap-2 md:col-span-2">
               <label className="text-sm font-medium">Qo'shimcha ma'lumot</label>
               <textarea
-                name="extraInfo"
-                value={form.extraInfo}
+                name="description"
+                value={form.description}
                 onChange={handleChange}
                 rows={4}
                 className="w-full border border-border dark:bg-background dark:text-foreground px-3 py-2 rounded"
@@ -187,46 +142,51 @@ export default function Loyality() {
         </div>
       )}
 
-      {promocodes.length > 0 && (
+      {isLoading ? (
+        <p>Yuklanmoqda...</p>
+      ) : error ? (
+        <p>Xatolik yuz berdi: {error.message}</p>
+      ) : paymentMethods.length > 0 ? (
         <div className="rounded-lg border dark:border-border overflow-x-auto">
           <Table>
             <TableCaption>Servislar ro'yxati</TableCaption>
             <TableHeader>
               <TableRow>
                 <TableHead>Nomi</TableHead>
-                <TableHead>To'lov usuli</TableHead>
+                <TableHead>Qo'shimcha ma'lumot</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Instrumentlar</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {promocodes.map((promo) => (
-                <TableRow key={promo.id}>
-                  <TableCell>{promo.name}</TableCell>
-                  <TableCell>{promo.paymentMethod}</TableCell>
+              {paymentMethods.map((method) => (
+                <TableRow key={method.payment_method_id}>
+                  <TableCell>{method.name}</TableCell>
+                  <TableCell>{method.description}</TableCell>
                   <TableCell>
                     <Switch
-                      checked={promo.status === "active"}
+                      checked={method.status === true}
                       onCheckedChange={(checked) =>
-                        dispatch(
-                          updatePromocode({
-                            ...promo,
-                            status: checked ? "active" : "inactive",
-                          })
-                        )
+                        updatePaymentMethodMutation.mutate({
+                          id: method.payment_method_id,
+                          updatedData: {
+                            ...method,
+                            status: checked ? true : false,
+                          },
+                        })
                       }
                     />
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-2 justify-end">
                       <button
-                        onClick={() => handleEdit(promo)}
+                        onClick={() => handleEdit(method)}
                         className="text-yellow-400 hover:text-yellow-500 flex items-center gap-1 transition"
                       >
                         <Pen className="w-4 h-4" /> Tahrirlash
                       </button>
                       <button
-                        onClick={() => handleDelete(promo.id)}
+                        onClick={() => handleDelete(method.payment_method_id)}
                         className="text-red-500 hover:text-red-600 flex items-center gap-1 transition"
                       >
                         <Trash2 className="w-4 h-4" /> O'chirish
@@ -238,6 +198,8 @@ export default function Loyality() {
             </TableBody>
           </Table>
         </div>
+      ) : (
+        <p>Hozircha hech qanday servis yo‘q.</p>
       )}
     </div>
   );

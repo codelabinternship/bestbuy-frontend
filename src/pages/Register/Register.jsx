@@ -2,9 +2,7 @@ import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Eye, EyeOff, Github, Facebook, Twitter } from "lucide-react";
-import { useAppDispatch, useAppSelector } from "../../app/store";
-import { register } from "../../features/auth/authSlice";
-import { PostData } from "@/api/authApi";
+
 import { useRegister } from "@/hooks/auth/useAuth";
 import { useNavigate } from "react-router-dom";
 
