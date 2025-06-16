@@ -37,5 +37,12 @@
   "All sales": "Все продажи",
   "Settings": "Настройки",
   "Promocodes": "Промокоды",
-  "Text messages": "Текстовые сообщения"
+  "Text messages": "Текстовые сообщения",
+  "Настройки Telegram": "Телеграм",
+  "Введите данные для подключения к Telegram": "Telegramni ulash uchun ma'lumotlarni kiriting",
+  "Токен бота": "Бот токени",
+  "Имя Бота": "Имя Бота",
+  "Активный": "Актив",
+  "Сохранить Telegram": "Сохранить Telegram",
+  "Do'kon boshqaruvi": "Do'kon boshqaruvi"
 }

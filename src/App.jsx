@@ -11,7 +11,7 @@ import SalesSettings from "./pages/SalesSettings";
 import Reviews from "./pages/reviews";
 import ProductsCategories from "./pages/online-shop/Categories";
 import Filials from "./pages/filial/FilialTable";
-import Settings from "./pages/settings";
+
 import DeliveringMethods from "./pages/delivering-methods";
 import Promocodes from "./pages/promocodes";
 import CreateAccount from "./pages/Login/Login";
@@ -19,6 +19,7 @@ import Register from "./pages/Register/Register";
 import Loyality from "./pages/paying-system/Loyality";
 import Tranzactions from "./pages/paying-system/Tranzactions";
 import Cookies from "js-cookie";
+import SettingsTabs from "./pages/settings/SettingsTab";
 
 const isAuthenticated = () => {
   const token = Cookies.get("token") || localStorage.getItem("token");
@@ -91,7 +92,7 @@ export default function Page() {
           />
           <Route
             path="/settings"
-            element={<PrivateRoute element={<Settings />} />}
+            element={<PrivateRoute element={<SettingsTabs />} />}
           />
           <Route
             path="/loyality/scores"

@@ -18,6 +18,7 @@
   "Online Shop": "Onlayn Do'kon",
   "Users": "Foydalanuvchilar",
   "Sales": "Sotuvlar",
+  "Settings": "Boshqaruv",
   "Marketing": "Marketing",
   "Reviews": "Sharhlar",
   "Loyalty Program": "Sodiqlik dasturi",
@@ -28,6 +29,12 @@
   "Active Users": "Faol foydalanuvchilar",
   "Non active Users": "Nofaol foydalanuvchilar",
   "Uzbek Users": "O‘zbek foydalanuvchilari",
-  "Russian Users": "Rus foydalanuvchilari"
-} 
-
+  "Russian Users": "Rus foydalanuvchilari",
+  "Настройки Telegram": "Telegram boshqaruvi",
+  "Введите данные для подключения к Telegram": "Telegramni ulash uchun ma'lumotlarni kiriting",
+  "Токен бота": "Bot tokeni",
+  "Имя Бота": "Bot Ismi",
+  "Активный": "Aktiv",
+  "Сохранить Telegram": "Telegramga saqlash",
+  "Do'kon boshqaruvi": "Do'kon boshqaruvi"
+}

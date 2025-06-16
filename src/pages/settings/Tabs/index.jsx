@@ -77,7 +77,7 @@ export default function Settings() {
 
   return (
     <div className="space-y-8 p-4">
-      <h1 className="text-xl font-semibold">Boshqaruv paneli</h1>
+      {/* <h1 className="text-xl font-semibold">Boshqaruv paneli</h1> */}
 
       <section className="flex flex-wrap gap-6 items-end">
         <div>
