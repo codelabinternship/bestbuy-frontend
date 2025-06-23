@@ -89,7 +89,7 @@ export default function BotConfigForm({ onSuccess }) {
         />
       </div>
 
-      <Label className="hover:bg-accent/50 flex items-start w-[100px] gap-3 rounded-lg border p-3 has-[[aria-checked=true]]:border-green-400 has-[[aria-checked=true]]:bg-green-100 dark:has-[[aria-checked=true]]:border-green-600 dark:has-[[aria-checked=true]]:bg-green-500">
+      <Label className="hover:bg-accent/50 flex items-start w-[130px] gap-3 rounded-lg border p-3 has-[[aria-checked=true]]:border-green-400 has-[[aria-checked=true]]:bg-green-100 dark:has-[[aria-checked=true]]:border-green-600 dark:has-[[aria-checked=true]]:bg-green-500">
         <Checkbox
           id="toggle-2"
           defaultChecked
