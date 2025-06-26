@@ -3,13 +3,13 @@ import api from "@/lib/axios";
 
 // GET
 const fetchCategories = async () => {
-  const res = await api.get("/categories/");
+  const res = await api.get("/api/categories/");
   return res.data;
 };
 
 // POST
 const addCategory = async (formData) => {
-  const res = await api.post("/categories/", formData, {
+  const res = await api.post("/api/categories/", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
   return res.data;
@@ -17,7 +17,7 @@ const addCategory = async (formData) => {
 
 // PUT
 const updateCategory = async ({ id, formData }) => {
-  const res = await api.put(`/categories/${id}/`, formData, {
+  const res = await api.put(`/api/categories/${id}/`, formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
   return res.data;
@@ -25,7 +25,7 @@ const updateCategory = async ({ id, formData }) => {
 
 // DELETE
 const deleteCategory = async (id) => {
-  await api.delete(`/categories/${id}/`);
+  await api.delete(`/api/categories/${id}/`);
 };
 
 export function useCategories() {

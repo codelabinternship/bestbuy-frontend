@@ -10,7 +10,7 @@ export function useMe() {
   return useQuery({
     queryKey: ["me"],
     queryFn: async () => {
-      const res = await api.get("api/api/auth/me/");
+      // const res = await api.get("api/api/auth/me/");
       document.title = res.data.market.name;
       function updateFavicon(url) {
         let link =
@@ -26,6 +26,6 @@ export function useMe() {
       updateFavicon(`http://127.0.0.1:8000${res.data.market.logo}`);
       return res.data;
     },
-    staleTime: 5 * 60 * 1000,
+    // //staleTime: 5 * 60 * 1000,
   });
 }

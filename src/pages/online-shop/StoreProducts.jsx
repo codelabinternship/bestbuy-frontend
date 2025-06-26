@@ -120,7 +120,7 @@ export default function ProductsList() {
                         >
                           <Trash2 className="w-4 h-4" /> Удалить
                         </button>
-                        <VariationManager productId={product.id} />
+                        {/* <VariationManager productId={product.id} /> */}
                       </div>
                     </TableCell>
                   </TableRow>

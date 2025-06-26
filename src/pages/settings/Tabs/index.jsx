@@ -13,7 +13,6 @@ import { useUpdateMarket } from "@/hooks/useMarket";
 export default function Settings() {
   const { data: profile, isLoading, isError } = useMe();
   const updateMarket = useUpdateMarket();
-
   const [form, setForm] = useState({
     name: "",
     address: "",

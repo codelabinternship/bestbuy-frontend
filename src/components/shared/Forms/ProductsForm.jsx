@@ -1,24 +1,14 @@
-// Combined ProductForm with Variation Step
 import React, { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { motion } from "framer-motion";
+
 import { useProducts } from "@/hooks/useProducts";
 import { useCategories } from "@/hooks/useCategories";
-import api from "@/lib/axios";
-import { useVariations } from "@/hooks/useVariations";
 
-export default function ProductWithVariationsForm({
-  initialData = null,
-  onSuccess,
-}) {
-  const [step, setStep] = useState(1);
+export default function ProductForm({ initialData = null, onSuccess }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [productId, setProductId] = useState(initialData?.id || null);
-
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -28,15 +18,9 @@ export default function ProductWithVariationsForm({
     brand: "",
     category: "",
     image: null,
+    variations: [{ option_name: "", option_value: "" }],
   });
   const [imagePreview, setImagePreview] = useState(null);
-  const { addVariationMutation, updateVariationMutation } =
-    useVariations(productId);
-  const [variations, setVariations] = useState({
-    option_name: "",
-    option_value: "",
-  });
-
   const { addProductMutation, updateProductMutation } = useProducts();
   const { data: categories = [] } = useCategories();
 
@@ -51,6 +35,9 @@ export default function ProductWithVariationsForm({
         brand: initialData.brand || "",
         category: initialData.category || "",
         image: initialData.image || null,
+        variations: initialData.variations || [
+          { option_name: "", option_value: "" },
+        ],
       });
       setImagePreview(initialData.image || null);
     }
@@ -59,232 +46,183 @@ export default function ProductWithVariationsForm({
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (files && files.length > 0) {
-      const file = files[0];
-      setFormData((prev) => ({ ...prev, [name]: file }));
-      setImagePreview(URL.createObjectURL(file));
+      setFormData((prev) => ({ ...prev, [name]: files[0] }));
+      setImagePreview(URL.createObjectURL(files[0]));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
+  const handleVariationChange = (index, e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => {
+      const updated = [...prev.variations];
+      updated[index][name] = value;
+      return { ...prev, variations: updated };
+    });
+  };
+
+  const addVariation = () => {
+    setFormData((prev) => ({
+      ...prev,
+      variations: [...prev.variations, { option_name: "", option_value: "" }],
+    }));
+  };
+
+  const removeVariation = (index) => {
+    if (formData.variations.length === 1) return;
+    setFormData((prev) => ({
+      ...prev,
+      variations: prev.variations.filter((_, i) => i !== index),
+    }));
+  };
+
   const submitProduct = async (e) => {
     e.preventDefault();
-    const fd = new FormData();
+    setLoading(true);
+    setError("");
+
+    const payload = new FormData();
     Object.entries(formData).forEach(([key, value]) => {
-      if (value !== null && value !== "") {
-        fd.append(key, value);
+      if (key == "variations") {
+        payload.append(key, JSON.stringify(value));
+      } else {
+        payload.append(key, value);
       }
     });
-
     try {
-      let id = productId;
+      console.log(payload);
+
       if (initialData) {
         await updateProductMutation.mutateAsync({
           id: initialData.id,
-          formData: fd,
+          formData: payload, // JSON format
         });
-        id = initialData.id;
       } else {
-        const res = await addProductMutation.mutateAsync(fd);
-        id = res?.id;
-        setProductId(id);
+        await addProductMutation.mutateAsync(payload);
       }
-      setStep(2);
-    } catch (err) {
-      setError("Failed to save product.");
-    }
-  };
 
-  const handleVariationChange = (e) => {
-    const { name, value } = e.target;
-
-    setVariations((prev) => ({ ...prev, [name]: value }));
-  };
-
-  // const addVariation = () => {
-  //   setVariations([...variations, { option_name: "", option_value: "" }]);
-  // };
-
-  // const removeVariation = (index) => {
-  //   if (variations.length === 1) return;
-  //   setVariations(variations.filter((_, i) => i !== index));
-  // };
-
-  const submitVariations = async (e) => {
-    e.preventDefault();
-    if (!productId) return;
-    setLoading(true);
-    setError("");
-    // if (editing) {
-    //   updateVariationMutation.mutate({
-    //     variation_id: editing.variation_id,
-    //     formData: payload,
-    //   });
-    // } else {
-    // }
-    try {
-      console.log(variations);
-      const newData = {
-        product_id: productId,
-        ...variations,
-      };
-      addVariationMutation.mutate(newData);
-      // if (!res.data) throw new Error("Failed to create variations");
-      alert("Variations created successfully!");
-      setStep(1);
-      setFormData({ name: "", price: "", description: "" });
-      setVariations([{ option_name: "", option_value: "" }]);
+      alert("Product saved successfully");
       onSuccess?.();
     } catch (err) {
-      setError(err.message);
+      console.error(err);
+      setError("Failed to save product.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-6 grid gap-6">
+    <div className="max-w-3xl mx-auto p-6 space-y-6">
       {error && (
         <div className="bg-red-100 text-red-700 p-3 rounded-xl shadow">
           {error}
         </div>
       )}
 
-      {step === 1 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="space-y-4"
-        >
-          <h2 className="text-2xl font-bold">Create Product</h2>
-          <Card className="shadow-lg">
-            <CardContent className="p-6 space-y-4">
-              <form onSubmit={submitProduct} className="grid gap-4">
-                <div>
-                  <Label htmlFor="name">Name</Label>
-                  <Input
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="price">Price</Label>
-                  <Input
-                    id="price"
-                    name="price"
-                    type="number"
-                    value={formData.price}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="description">Description</Label>
-                  <Input
-                    id="description"
-                    name="description"
-                    value={formData.description}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="discount_price">Discount price</Label>
-                  <Input
-                    id="discount_price"
-                    name="discount_price"
-                    type="number"
-                    value={formData.discount_price}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="stock_quantity">Stock quantity</Label>
-                  <Input
-                    id="stock_quantity"
-                    name="stock_quantity"
-                    type="number"
-                    value={formData.stock_quantity}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="brand">Brand</Label>
-                  <Input
-                    id="brand"
-                    name="brand"
-                    value={formData.brand}
-                    onChange={handleChange}
-                  />
-                </div>
-                <Button type="submit" disabled={loading} className="w-full">
-                  {loading ? "Saving..." : "Save & Continue to Variations"}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-        </motion.div>
-      )}
+      <Card className="shadow-lg">
+        <CardContent className="p-6 space-y-4">
+          <form onSubmit={submitProduct} className="grid gap-4">
+            <Input
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="Name"
+              required
+            />
+            <Input
+              name="price"
+              type="number"
+              value={formData.price}
+              onChange={handleChange}
+              placeholder="Price"
+              required
+            />
+            <Input
+              name="discount_price"
+              type="number"
+              value={formData.discount_price}
+              onChange={handleChange}
+              placeholder="Discount Price"
+            />
+            <Input
+              name="stock_quantity"
+              type="number"
+              value={formData.stock_quantity}
+              onChange={handleChange}
+              placeholder="Stock Quantity"
+            />
+            <Input
+              name="brand"
+              value={formData.brand}
+              onChange={handleChange}
+              placeholder="Brand"
+            />
+            <Input
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              placeholder="Description"
+            />
 
-      {step === 2 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="space-y-4"
-        >
-          <h2 className="text-2xl font-bold">Add Variations</h2>
-          <p className="text-sm text-gray-500">Product ID: {productId}</p>
-          <Card className="shadow-lg">
-            <CardContent className="p-6 space-y-6">
-              <form onSubmit={submitVariations} className="space-y-6">
-                {/* {variations.map((variation, index) => ( */}
-                <div className="grid md:grid-cols-4 gap-4 items-end border-b pb-4 last:border-b-0">
-                  <div>
-                    <Label htmlFor={`option_name-${1}`}>Option Name</Label>
-                    <Input
-                      id={`option_name-${1}`}
-                      name="option_name"
-                      value={variations.option_name}
-                      onChange={(e) => handleVariationChange(e)}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor={`option_value-${2}`}>Option Value</Label>
-                    <Input
-                      id={`option_value-${2}`}
-                      name="option_value"
-                      value={variations.option_value}
-                      onChange={(e) => handleVariationChange(e)}
-                    />
-                  </div>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    // onClick={() => removeVariation(index)}
-                    className="self-center text-red-600"
-                  >
-                    Remove
-                  </Button>
-                </div>
+            <select
+              name="category"
+              value={formData.category}
+              onChange={handleChange}
+              className="border p-2 rounded"
+            >
+              <option value="">Select category</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
 
+            <Input type="file" name="image" onChange={handleChange} />
+            {imagePreview && (
+              <img
+                src={imagePreview}
+                alt="Preview"
+                className="w-32 h-32 object-cover"
+              />
+            )}
+
+            <h3 className="font-bold text-lg mt-4">Variations</h3>
+            {formData.variations.map((variation, index) => (
+              <div key={index} className="grid grid-cols-3 gap-4 items-end">
+                <Input
+                  name="option_name"
+                  value={variation.option_name}
+                  onChange={(e) => handleVariationChange(index, e)}
+                  placeholder="Option Name"
+                />
+                <Input
+                  name="option_value"
+                  value={variation.option_value}
+                  onChange={(e) => handleVariationChange(index, e)}
+                  placeholder="Option Value"
+                />
                 <Button
                   type="button"
-                  variant="secondary"
-                  // onClick={addVariation}
-                  className="w-full"
+                  variant="ghost"
+                  className="text-red-500"
+                  onClick={() => removeVariation(index)}
                 >
-                  + Add Another Variation
+                  Remove
                 </Button>
-                <Button type="submit" disabled={loading} className="w-full">
-                  {loading ? "Saving..." : "Save Variations"}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-        </motion.div>
-      )}
+              </div>
+            ))}
+            <Button type="button" variant="secondary" onClick={addVariation}>
+              + Add Another Variation
+            </Button>
+
+            <Button type="submit" disabled={loading} className="w-full">
+              {loading ? "Saving..." : "Save Product"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 }

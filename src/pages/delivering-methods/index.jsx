@@ -1,3 +1,12 @@
+// DeliveryDepartmentsPage.jsx
+import React, { useState } from "react";
+import { useDeliveryDepartments } from "@/hooks/useDeliveryDepartments";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+
+import { Pen, Trash2 } from "lucide-react";
+
+import DeliveryDepartmentForm from "../../components/shared/Forms/DeliveryDepartmentForm";
 import {
   Table,
   TableBody,
@@ -7,208 +16,92 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Pen, Trash2 } from "lucide-react";
-import { Switch } from "@/components/ui/switch";
-import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  addProduct,
-  updateProduct,
-  deleteProduct,
-} from "../../features/sliceDelivering/deliveringSlice";
 
-const DeliveringMethods = () => {
+const DeliveryDepartmentsPage = () => {
+  const {
+    data: departments = [],
+    isLoading,
+    error,
+    deleteDepartment,
+  } = useDeliveryDepartments();
   const [showForm, setShowForm] = useState(false);
-  const delivering = useSelector((state) => state.delivering.list);
-  const dispatch = useDispatch();
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [editData, setEditData] = useState(null);
 
-  const [deliveringForm, setDeliveringForm] = useState({
-    title: "",
-    description: "",
-    items: "",
-  });
-
-  const [isEditing, setIsEditing] = useState(false);
-  const [editingId, setEditingId] = useState(null);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setDeliveringForm({ ...deliveringForm, [name]: value });
-  };
-
-  const resetForm = () => {
-    setDeliveringForm({
-      title: "",
-      description: "",
-      items: "",
-    });
-    setIsEditing(false);
-    setEditingId(null);
-    setShowForm(false);
-  };
-
-  const handleSave = () => {
-    const { title, description, items, status } = deliveringForm;
-
-    if (!title || !description || !items) {
-      alert("Please fill in all fields.");
-      return;
-    }
-
-    const data = {
-      id: isEditing ? editingId : Date.now(),
-      title,
-      description,
-      items,
-      date: new Date().toISOString(),
-      status
-    };
-
-    if (isEditing) {
-      dispatch(updateProduct(data));
-    } else {
-      dispatch(addProduct(data));
-    }
-
-    resetForm();
-  };
-
-  const handleEdit = (item) => {
-    setDeliveringForm({
-      title: item.title,
-      description: item.description,
-      items: item.items || "",
-      status: item.status
-    });
-    setIsEditing(true);
-    setEditingId(item.id);
+  const handleEdit = (dept) => {
     setShowForm(true);
+    setEditData(dept);
   };
 
   const handleDelete = (id) => {
-    if (confirm("Are you sure you want to delete this item?")) {
-      dispatch(deleteProduct(id));
+    if (confirm("Haqiqatan ham o'chirmoqchimisiz?")) {
+      deleteDepartment(id);
     }
   };
 
   return (
-    <div>
-      <div className="flex justify-between m-6">
-        <p className="font-medium">Yetkazib berish usullari</p>
+    <div className="max-w-4xl mx-auto p-6 space-y-6">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Dostavka</h1>
         <button
-          onClick={() => setShowForm(true)}
-          className="border rounded-lg p-3 text-white bg-blue-500 hover:bg-blue-700"
+          className="bg-green-600 text-white px-5 py-2 rounded"
+          onClick={() => {
+            setEditingProduct(null);
+            setShowForm(true);
+          }}
         >
-          Yetkazib berish usulini ulash
+          {editingProduct ? "Редактировать" : "Создать продукт"}
         </button>
       </div>
-
       {showForm && (
-        <div className="px-6">
-          <div className="mb-4">
-            <p className="mb-1">Nomi</p>
-            <input
-              name="title"
-              value={deliveringForm.title}
-              onChange={handleChange}
-              className="border rounded-md w-full p-2"
-              type="text"
-              placeholder="Nomi..."
-            />
-          </div>
-          <div className="mb-4">
-            <p className="mb-1">Yetkazib berish turi</p>
-            <input
-              name="description"
-              value={deliveringForm.description}
-              onChange={handleChange}
-              className="border rounded-md w-full p-2"
-              type="text"
-              placeholder="Yetkazib berish turi..."
-            />
-          </div>
-          <div className="mb-4">
-            <p className="mb-1">Yangilangan</p>
-            <input
-              name="items"
-              value={deliveringForm.items}
-              onChange={handleChange}
-              className="border rounded-md w-full p-2"
-              type="text"
-              placeholder="Yangilangan..."
-            />
-          </div>
-          <div className="flex items-center gap-4 mb-6">
-            <p>Statusi</p>
-            <Switch
-              checked={deliveringForm.status}
-              onCheckedChange={(value) => handleChange({target:{ name: "status",value }})}
-            />
-
-
-          </div>
-          <div className="flex justify-between">
-            <button
-              onClick={resetForm}
-              className="border rounded-md bg-gray-300 px-4 py-2"
-            >
-              Bekor qilish
-            </button>
-            <button
-              onClick={handleSave}
-              className="bg-green-600 text-white px-6 py-2 rounded"
-            >
-              Saqlash
-            </button>
-          </div>
+        <div className="mb-6">
+          <DeliveryDepartmentForm
+            initialData={editData}
+            onSuccess={() => setEditData(null)}
+          />
         </div>
       )}
-
-      {!showForm && (
+      <div className="shadow-xl rounded p-3 dark:bg-[#222122] dark:text-white">
         <Table>
-          <TableCaption>Oxirgi yetkazib berish usullari ro'yxati</TableCaption>
+          <TableCaption>A list of your recent products.</TableCaption>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[250px]">Nomi</TableHead>
-              <TableHead>Yetkazib berish turi</TableHead>
-              <TableHead>Yangilangan</TableHead>
-              <TableHead >Statusi</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Address</TableHead>
+              <TableHead>Phone</TableHead>
+              <TableHead className="text-right">Tools</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {delivering.map((item) => (
-              <TableRow key={item.id}>
-                <TableCell>{item.title}</TableCell>
-                <TableCell>{item.description}</TableCell>
-                <TableCell>
-                  {item.date ? new Date(item.date).toLocaleDateString() : "—"}
-                </TableCell>
-                <TableCell>
-                  <Switch checked={item.status} />
-                </TableCell>
+            {departments.map((department) => (
+              <TableRow key={department.id}>
+                <TableCell>{department.name}</TableCell>
+                <TableCell>{department.address}</TableCell>
+                <TableCell>{department.phone}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex gap-2 justify-end">
                     <button
-                      onClick={() => handleEdit(item)}
-                      className=" text-yellow-500 px-3 py-1 rounded flex items-center gap-1"
+                      onClick={() => handleEdit(department)}
+                      className="text-yellow-400 gap-1 flex items-center px-4 py-1 rounded"
                     >
-                      <Pen className="w-4 h-4" /> Tuzatish
+                      <Pen className="w-4 h-4" /> Редактировать
                     </button>
                     <button
-                      onClick={() => handleDelete(item.id)}
-                      className=" text-red-500 flex items-center gap-1"
+                      onClick={() => handleDelete(department.id)}
+                      className="text-red-500 gap-1 flex items-center px-4 py-1 rounded"
                     >
-                      <Trash2 className="w-4 h-4" /> O'chirish
+                      <Trash2 className="w-4 h-4" /> Удалить
                     </button>
+                    {/* <VariationManager productId={product.id} /> */}
                   </div>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
-      )}
+      </div>
     </div>
   );
 };
 
-export default DeliveringMethods;
+export default DeliveryDepartmentsPage;

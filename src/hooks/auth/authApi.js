@@ -24,7 +24,6 @@ export const login = async (data) => {
     const res = await axios.post("/api/auth/login/", data);
     return res.data;
   } catch (err) {
-    // Backend ishlamasa xato return qilish mumkin
     throw new Error(
       "Login failed: Backend is unreachable or credentials are invalid"
     );
