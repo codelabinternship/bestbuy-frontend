@@ -71,7 +71,16 @@ export default function Settings() {
       setForm((prev) => ({ ...prev, [name]: value }));
     }
   };
-  if (isLoading) return <p className="m-4">Yuklanmoqda...</p>;
+  if (isLoading)
+    return (
+      <div className="flex mt-[230px] justify-center gap-5">
+        <div class="three-body">
+          <div class="three-body__dot"></div>
+          <div class="three-body__dot"></div>
+          <div class="three-body__dot"></div>
+        </div>
+      </div>
+    );
   if (isError) return <p className="m-4 text-red-600">Xatolik yuz berdi.</p>;
 
   return (

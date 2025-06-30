@@ -2,10 +2,19 @@ import { useState } from "react";
 import { useFilials } from "@/hooks/useFilials";
 import FilialForm from "@/components/shared/Forms/FilialForm";
 import { Pen, Trash2 } from "lucide-react";
-
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { useTranslation } from "react-i18next";
 export default function Filials() {
   const { data: filials = [], isLoading, deleteFilialMutation } = useFilials();
-
+  const { t } = useTranslation();
   const [showForm, setShowForm] = useState(false);
   const [editingFilial, setEditingFilial] = useState(null);
 
@@ -50,53 +59,55 @@ export default function Filials() {
       )}
 
       {isLoading ? (
-        <p>Loading filials...</p>
+        <div className="flex mt-[230px] justify-center gap-5">
+          <div class="three-body">
+            <div class="three-body__dot"></div>
+            <div class="three-body__dot"></div>
+            <div class="three-body__dot"></div>
+          </div>
+        </div>
       ) : (
-        <div className="shadow rounded border p-4">
-          <table className="w-full table-auto">
-            <thead>
-              <tr className="text-left">
-                <th>Name</th>
-                <th>Address</th>
-                <th>Phone</th>
-                <th>Working Hours</th>
-                <th className="text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filials.map((filial) => (
-                <tr key={filial.id} className="border-t">
-                  <td>{filial.name}</td>
-                  <td>{filial.address}</td>
-                  <td>{filial.phone}</td>
-                  <td>{filial.working_hours}</td>
-                  <td className="text-right">
+        <div className="shadow-xl rounded p-3 dark:bg-[#222122] dark:text-white">
+          <Table>
+            <TableCaption>A list of your recent branches.</TableCaption>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[100px]">{t("Name")}</TableHead>
+                <TableHead>{t("Title")}</TableHead>
+                <TableHead>{t("Description")}</TableHead>
+                <TableHead>{t("Status")}</TableHead>
+                <TableHead className="text-right">{t("Tools")}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filials.map((cat) => (
+                <TableRow key={cat.id}>
+                  <TableCell>{cat.name}</TableCell>
+                  <TableCell>
+                    <p>{cat.address}</p>
+                  </TableCell>
+                  <TableCell>{cat.phone}</TableCell>
+                  <TableCell>{cat.description}</TableCell>
+                  <TableCell className="text-right">
                     <div className="flex gap-2 justify-end">
                       <button
-                        onClick={() => handleEdit(filial)}
-                        className="text-yellow-500 flex items-center gap-1"
+                        onClick={() => handleEdit(cat)}
+                        className="text-yellow-400 gap-1 flex items-center px-4 py-1 rounded"
                       >
-                        <Pen className="w-4 h-4" /> Edit
+                        <Pen className="w-4 h-4" /> Редактировать
                       </button>
                       <button
-                        onClick={() => handleDelete(filial.branch_id)}
-                        className="text-red-500 flex items-center gap-1"
+                        onClick={() => handleDelete(cat.id)}
+                        className="text-red-500 gap-1 flex items-center px-4 py-1 rounded"
                       >
-                        <Trash2 className="w-4 h-4" /> Delete
+                        <Trash2 className="w-4 h-4" /> Удалить
                       </button>
                     </div>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))}
-              {filials.length === 0 && (
-                <tr>
-                  <td colSpan="4" className="text-center py-4">
-                    No filials found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       )}
     </div>

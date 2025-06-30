@@ -3,22 +3,22 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/axios";
 
 const fetchFilials = async () => {
-  const res = await api.get("/branches/");
+  const res = await api.get("/api/branches/");
   return res.data;
 };
 
 const addFilial = async (newFilial) => {
-  const res = await api.post("/branches/", newFilial);
+  const res = await api.post("/api/branches/", newFilial);
   return res.data;
 };
 
 const updateFilial = async ({ id, data }) => {
-  const res = await api.put(`/branches/${id}/`, data);
+  const res = await api.put(`/api/branches/${id}/`, data);
   return res.data;
 };
 
 const deleteFilial = async (id) => {
-  await api.delete(`/branches/${id}/`);
+  await api.delete(`/api/branches/${id}/`);
 };
 
 export function useFilials() {

@@ -44,26 +44,17 @@ export default function ProductsCategories() {
   return (
     <div className="max-w-6xl mx-auto p-6 dark:bg-[#222122] dark:text-white">
       {isLoading ? (
-        <div className="flex items-baseline justify-center gap-5">
-          <div class="loader ">
-            <div class="loader__bar "></div>
-            <div class="loader__bar"></div>
-            <div class="loader__bar"></div>
-            <div class="loader__bar"></div>
-            <div class="loader__bar"></div>
-            <div class="loader__ball"></div>
-          </div>
-          <p className="text-2xl">Loading categories</p>
-          <div class="wrapper ">
-            <div class="circle"></div>
-            <div class="circle"></div>
-            <div class="circle"></div>
+        <div className="flex mt-[230px] justify-center gap-5">
+          <div class="three-body">
+            <div class="three-body__dot"></div>
+            <div class="three-body__dot"></div>
+            <div class="three-body__dot"></div>
           </div>
         </div>
       ) : categories.length >= 0 ? (
         <div>
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold">Категории</h1>
+            <h1 className="text-2xl font-bold">{t("Categories")}</h1>
             <button
               className="bg-green-600 text-white px-5 py-2 rounded"
               onClick={() => {
@@ -72,7 +63,7 @@ export default function ProductsCategories() {
                 setShowForm(true);
               }}
             >
-              {editingCategory ? "Редактировать" : "Создать категорию"}
+              {editingCategory ? "Редактировать" : t("Создать категорию")}
             </button>
           </div>
 
@@ -89,11 +80,11 @@ export default function ProductsCategories() {
               <TableCaption>A list of your recent categories.</TableCaption>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[100px]">Image</TableHead>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Description</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Tools</TableHead>
+                  <TableHead className="w-[100px]">{t("Image")}</TableHead>
+                  <TableHead>{t("Title")}</TableHead>
+                  <TableHead>{t("Description")}</TableHead>
+                  <TableHead>{t("Status")}</TableHead>
+                  <TableHead className="text-right">{t("Tools")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

@@ -48,16 +48,12 @@ export default function ProductsList() {
   return (
     <div className="max-w-6xl mx-auto p-6 dark:bg-[#222122] dark:text-white">
       {isLoading ? (
-        <div className="flex items-baseline justify-center gap-5">
-          <div className="loader">
-            <div className="loader__bar"></div>
-            <div className="loader__bar"></div>
-            <div className="loader__bar"></div>
-            <div className="loader__bar"></div>
-            <div className="loader__bar"></div>
-            <div className="loader__ball"></div>
+        <div className="flex mt-[230px] justify-center gap-5">
+          <div class="three-body">
+            <div class="three-body__dot"></div>
+            <div class="three-body__dot"></div>
+            <div class="three-body__dot"></div>
           </div>
-          <p className="text-2xl">Loading products...</p>
         </div>
       ) : products.length >= 0 ? (
         <div>
@@ -88,10 +84,11 @@ export default function ProductsList() {
               <TableCaption>A list of your recent products.</TableCaption>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[100px]">Image</TableHead>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead className="text-right">Tools</TableHead>
+                  <TableHead className="w-[100px]">{t("Image")}</TableHead>
+                  <TableHead>{t("Title")}</TableHead>
+                  <TableHead>{t("Description")}</TableHead>
+                  <TableHead>{t("Price")}</TableHead>
+                  <TableHead className="text-right">{t("Tools")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
